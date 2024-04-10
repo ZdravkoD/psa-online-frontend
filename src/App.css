@@ -1,0 +1,10 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-top: 50px;
+}
+label {
+  margin-right: 10px;
+}
