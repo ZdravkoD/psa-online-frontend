@@ -1,20 +1,21 @@
 // src/index.tsx
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
+import { createRoot } from 'react-dom/client';
 import App from './App';
+import './index.css';
 import reportWebVitals from './utils/reportWebVitals';
-import { BrowserRouter as Router } from 'react-router-dom';
 
-// const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-ReactDOM.render(
+// Create a root.
+const container = document.getElementById('root');
+const root = createRoot(container); // createRoot(container!) if you're sure 'root' is non-null
+
+// Initial render: Render the app in the root.
+root.render(
   <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
-  </React.StrictMode>,
-  document.getElementById('root')
+    <App />
+  </React.StrictMode>
 );
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
