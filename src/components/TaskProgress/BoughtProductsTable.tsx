@@ -46,7 +46,7 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                                 {sting_info?.name || "N/A"}
                             </TableCell>
                             <TableCell align="right" sx={{ minWidth: 50, backgroundColor: product.bought_from_distributor === "Sting" ? '#ccffbc' : 'inherit' }}>
-                                {`${sting_info.price} лв`}
+                                {sting_info.price > 0 ? `${sting_info.price} лв` : "N/A"}
                             </TableCell>
                             <TableCell align="right" sx={{ backgroundColor: product.bought_from_distributor === "Phoenix" ? '#ccffbc' : 'inherit' }}>
                                 {phoenix_info?.name || "N/A"}
