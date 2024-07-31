@@ -25,8 +25,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build-staging": "dotenv -e .env.staging react-scripts build",
-    "build": "dotenv -e .env.production react-scripts build",
+    "build-staging": "dotenv -e .env.staging -- react-scripts build",
+    "build": "dotenv -f .env.production -- react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -47,5 +47,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.4.2"
   }
 }
