@@ -93,6 +93,19 @@ const TaskProgress: React.FC = () => {
         setExpanded(!expanded);
     };
 
+    
+    const outputs = useAzurePubSubSocket();
+
+    useEffect(() => {
+      console.debug("Azure Pub/Sub socket connected...");
+      setTaskData(outputs[0]);
+      setWsError(outputs[1]);
+      return () => {
+        console.debug("Azure Pub/Sub socket disconnected...");
+      };
+    }, [outputs]);
+  
+
     let descriptionObject: Record<string, any> | null = null;
     try {
         descriptionObject = JSON.parse(description) as Record<string, any>;
@@ -147,6 +160,9 @@ const TaskProgress: React.FC = () => {
 
     return (
         <Container>
+            <Button variant="contained" onClick={handleBackToHistory}>
+                Back to Task History
+            </Button>            
             <Container maxWidth="sm">
                 <Box sx={{ width: '100%', mb: 2 }}>
                     {inputFilename && (
