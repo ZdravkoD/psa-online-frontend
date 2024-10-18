@@ -5,13 +5,6 @@
       "methods": [
         "get"
       ],
-      "rewrite": "/index.html"
-    },
-    {
-      "route": "/tasks-history",
-      "methods": [
-        "get"
-      ],
       "redirect": "/"
     }
   ]
