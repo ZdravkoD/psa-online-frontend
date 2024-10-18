@@ -130,7 +130,7 @@ const TasksHistory: React.FC = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            {loading && <p>Loading...</p>}
+            {loading && <p>Зареждане...</p>}
         </div>
     );
 };

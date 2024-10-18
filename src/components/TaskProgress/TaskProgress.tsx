@@ -8,7 +8,7 @@ import config from '../../config/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import * as XLSX from 'xlsx';
-import excelLogo from '../../assets/icons/logo-excel.svg';
+import excelLogo from '../../assets/icons/excel-logo.png';
 import downloadIcon from '../../assets/icons/download-file-icon.png';
 import debugIcon from '../../assets/icons/debug-icon.png';
 import { setTaskData } from '../../store/wsTaskData';
