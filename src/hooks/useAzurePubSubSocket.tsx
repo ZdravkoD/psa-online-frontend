@@ -2,21 +2,21 @@ import { useState, useEffect } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import config from '../config/config';
 
-// Define your task data structure
-interface TaskData {
-  status: string;
-  message: string;
-  progress: number;
-  detailed_error_message?: string;
+// Export the TaskData interface
+export interface TaskData {
+  status: Record<string, any>;
+  report: Record<string, any>;
+  file_name: string;
+  image_urls?: string[];
 }
 
 // The hook
 function useAzurePubSubSocket() {
-  const [taskData, setTaskData] = useState<TaskData>({ status: '', message: '', progress: 0 });
-  const [wsError, setWsError] = useState(null);
+  const [taskData, setTaskData] = useState<TaskData>({ status: {}, report: {}, file_name: '', image_urls: [] });
+  const [wsError, setWsError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function generateAccessToken(hubName, userId) {
+    async function generateAccessToken(hubName: string, userId: string) {
       const url = `${config.apiBaseUrl}/pubsub-token?hub_name=${encodeURIComponent(hubName)}&user_id=${encodeURIComponent(userId)}`;
       try {
         const response = await fetch(url);
@@ -29,7 +29,7 @@ function useAzurePubSubSocket() {
         setWsError(null);
         return await response.text();
       } catch(error) {
-        const errorMessage = `Failed to fetch access token: ${error.message}`
+        const errorMessage = 'Failed to fetch access token: ' + (error instanceof Error ? error.message : String(error))
         setWsError(errorMessage);
         throw error;
       }
@@ -39,11 +39,12 @@ function useAzurePubSubSocket() {
       const hub_name = 'task_status_updates';
       try {
         const accessToken = await generateAccessToken(hub_name, 'only_user');
-        return `wss://psa-pubsub.webpubsub.azure.com/client/hubs/${hub_name}?access_token=${accessToken}`;  
+        return `${config.pubsubUrl}/client/hubs/${hub_name}?access_token=${accessToken}`;  
       } catch (error) {
         console.error('Failed to generate access token:', error);
-        setWsError('Failed to generate access token: ' + error.message);
-        return `wss://psa-pubsub.webpubsub.azure.com/client/hubs/${hub_name}`;
+        const errorMessage = 'Failed to generate access token: ' + (error instanceof Error ? error.message : String(error));
+        setWsError(errorMessage);
+        return `${config.pubsubUrl}/client/hubs/${hub_name}`;
       }
     };
 
@@ -55,9 +56,9 @@ function useAzurePubSubSocket() {
       console.debug("Received data: ", data);
       setTaskData({
         status: data.status,
-        message: data.message,
-        progress: data.progress,
-        detailed_error_message: data.detailed_error_message,
+        report: data.report,
+        file_name: data.file_name,
+        image_urls: data.image_urls,
       });
     };
 
@@ -68,7 +69,7 @@ function useAzurePubSubSocket() {
     return () => ws.close();
   }, []);
 
-  return [taskData, wsError];
+  return { taskData, wsError };
 }
 
 export default useAzurePubSubSocket;

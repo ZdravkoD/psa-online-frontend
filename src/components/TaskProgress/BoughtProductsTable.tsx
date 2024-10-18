@@ -36,8 +36,8 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                 </TableHead>
                 <TableBody>
                     {boughtProductsTableProps.products.map((product) => {
-                        const sting_info = product.all_pharmacy_product_infos.filter(info => info.distributor === "Sting")[0] || {name: "Not found", price: -1};
-                        const phoenix_info = product.all_pharmacy_product_infos.filter(info => info.distributor === "Phoenix")[0] || {name: "Not found", price: -1};
+                        const sting_info = product.all_pharmacy_product_infos.filter(info => info.distributor === "Sting")[0] || {name: "Не е намерен", price: -1};
+                        const phoenix_info = product.all_pharmacy_product_infos.filter(info => info.distributor === "Phoenix")[0] || {name: "Не е намерен", price: -1};
                         return (<TableRow key={product.original_product_name} hover>
                             <TableCell component="th" scope="row" sx={{ minWidth: 300 }}>
                                 {product.original_product_name}
@@ -52,7 +52,7 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                                 {phoenix_info?.name || "N/A"}
                             </TableCell>
                             <TableCell align="right" sx={{ minWidth: 50, backgroundColor: product.bought_from_distributor === "Phoenix" ? '#ccffbc' : 'inherit' }}>
-                                {`${phoenix_info.price} лв`}
+                                {phoenix_info.price > 0 ? `${phoenix_info.price} лв` : "N/A"}
                             </TableCell>
                         </TableRow>)
                     })}
@@ -63,5 +63,3 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
 };
 
 export default BoughtProductsTable;
-
-export { AllPharmacyProductInfos, BoughtProduct, BoughtProductsTableProps };

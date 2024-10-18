@@ -22,14 +22,14 @@ function useFetchInitData() {
     const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
     const [distributors, setDistributors] = useState<Distributor[]>([]);
     const [fetchInitDataLoading, setLoading] = useState(true);
-    const [fetchInitDataError, setError] = useState<string>(null);
+    const [fetchInitDataError, setError] = useState<string | null>(null);
 
     useEffect(() => {
         console.debug("Fetching init data...")
         const fetchData = async () => {
             try {
                 setLoading(true);
-                setError(null);
+                setError("");
                 
                 const responses = await Promise.all([
                     fetch(pharmacyUrl),
@@ -45,7 +45,11 @@ function useFetchInitData() {
                 setDistributors(data[1]);
             } catch (error) {
                 console.error('Error fetching data:', error);
-                setError(error.message);
+                if (error instanceof Error) {
+                    setError(error.message);
+                } else {
+                    setError('An unknown error occurred');
+                }
             } finally {
                 setLoading(false);
             }

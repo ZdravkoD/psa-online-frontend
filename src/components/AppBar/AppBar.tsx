@@ -49,7 +49,7 @@ export default function MyAppBar() {
                     </ListItemIcon>
                     <ListItemText primary="Нова поръчка" />
                 </ListItem>
-                <ListItem button onClick={() => handleNavigation('/request-history')}>
+                <ListItem button onClick={() => handleNavigation('/tasks-history')}>
                     <ListItemIcon>
                         <HistoryIcon />
                     </ListItemIcon>
@@ -73,10 +73,21 @@ export default function MyAppBar() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: "pointer" }} onClick={() => handleNavigation('/')}>
+                    <Typography
+                        variant="h6"
+                        component="div"
+                        sx={{ flexGrow: 1, cursor: "pointer" }}
+                        onClick={(event) => {
+                            if (event.metaKey) {
+                                window.open('/', '_blank');
+                            } else {
+                                handleNavigation('/');
+                            }
+                        }}
+                    >
                         Pharmacy Stock Automation
                     </Typography>
-                    {auth && (
+                    {/* {auth && (
                         <IconButton
                             size="large"
                             aria-label="account of current user"
@@ -89,7 +100,7 @@ export default function MyAppBar() {
                     )}
                     {!auth && (
                         <Button color="inherit">Login</Button>
-                    )}
+                    )} */}
                 </Toolbar>
             </AppBar>
             <Drawer

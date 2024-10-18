@@ -15,8 +15,8 @@ const HomePage: React.FC = () => {
         <Typography variant="h4" gutterBottom>
           Добре дошли в Pharmacy Stock Automation!
         </Typography>
-        <Typography variant="body1" gutterBottom>
-          Щракнете по-долу, за да управлявате вашите задачи и да следите инвентара на аптеката.
+        <Typography variant="body1" gutterBottom style={{ paddingBottom: '10px' }}>
+          Натиснете по-долу, за да управлявате вашите задачи.
         </Typography>
         <Button variant="contained" color="primary" onClick={handleStartTask}>
           Стартирай нова поръчка

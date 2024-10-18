@@ -1,6 +1,9 @@
 # psa-online-frontend
 React app for Pharmacy Stock Automation deployed to the Cloud.
 
+## Node version
+Check the .nvmrc file.
+
 ## Available Scripts
 
 In the project directory, you can run:

@@ -16,7 +16,7 @@ export default function PsaForm() {
     const [selectedFileName, setSelectedFileName] = useState<string>('');
     const [selectedDistributors, setSelectedDistributors] = useState<string[]>([]);
     const [formError, setFormError] = useState({ file: false, pharmacy: false, suppliers: false });
-    const [httpError, setHttpError] = useState(null);
+    const [httpError, setHttpError] = useState<string | null>(null);
     
     const { pharmacies, distributors, fetchInitDataLoading, fetchInitDataError } = useFetchInitData();
     
@@ -120,7 +120,7 @@ export default function PsaForm() {
           console.log('Task created:', data);
           setHttpError(null);
           // Navigate to the task progress page
-          navigate('/task-progress');
+          navigate(`/task-progress/${data.id}`);
         } else {
           const responseText = await response.text();
           console.error('Failed to create task:', response.statusText, responseText);
@@ -129,7 +129,11 @@ export default function PsaForm() {
       }
       catch (error) {
         console.error('Failed to create task:', error);
-        setHttpError(error.message || 'Error occurred while creating task.');
+        if (error instanceof Error) {
+          setHttpError(error.message || 'Error occurred while creating task.');
+        } else {
+          setHttpError('Error occurred while creating task.');
+        }
         return;
       }
     };
