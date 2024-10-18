@@ -42,7 +42,7 @@ const TasksHistory: React.FC = () => {
     const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate();
 
-    const { pharmacies, distributors, fetchInitDataLoading, fetchInitDataError } = useFetchInitData();
+    const { pharmacies, fetchInitDataLoading, fetchInitDataError } = useFetchInitData();
 
     useEffect(() => {
         if (fetchInitDataLoading) {
@@ -59,7 +59,7 @@ const TasksHistory: React.FC = () => {
         const fetchTasks = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(`${API_BASE_URL}/tasks?skip=${skip}&limit=${limit}&sort=\{"date_created":-1\}`);
+                const response = await axios.get(`${API_BASE_URL}/tasks?skip=${skip}&limit=${limit}&sort={"date_created":-1}`);
                 const filteredTasks = response.data.filter((task: Task) => task.status);
                 setTasks(prevTasks => [...prevTasks, ...filteredTasks]);
                 setHasMore(response.data.length === limit);
@@ -121,7 +121,7 @@ const TasksHistory: React.FC = () => {
                                     </TableCell>
                                     <TableCell>{new Date(task.date_created).toLocaleString()}</TableCell>
                                     <TableCell style={{ display: 'flex', alignItems: 'center' }}>
-                                        <img src={statusIcons[task.status.status]} style={{ width: '30px', height: 'auto', marginRight: '8px' }} />
+                                        <img src={statusIcons[task.status.status]} alt="" style={{ width: '30px', height: 'auto', marginRight: '8px' }} />
                                         {statusTranslations[task.status.status] || task.status.status}
                                     </TableCell>
                                 </TableRow>

@@ -32,7 +32,7 @@ const App: React.FC = () => {
     return () => {
       console.debug("Azure Pub/Sub socket disconnected...");
     };
-  }, [outputs]);
+  }, [outputs, dispatch]);
 
   return (
       <Router>

@@ -49,7 +49,7 @@ const TaskProgress: React.FC = () => {
         };
 
         fetchTaskDetails();
-    }, [taskId]);
+    }, [taskId, dispatch]);
 
     useEffect(() => {
         console.log('TaskData:', taskData);
@@ -247,7 +247,7 @@ const TaskProgress: React.FC = () => {
                             <img
                                 key={index}
                                 src={image_url}
-                                alt={`Task Image ${index + 1}`}
+                                alt=""
                                 style={{ width: '100%', marginBottom: '10px' }}
                             />
                         ))}

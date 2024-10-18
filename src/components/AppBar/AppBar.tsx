@@ -1,21 +1,14 @@
 import * as React from 'react';
-import { AppBar, Box, Toolbar, Typography, IconButton, Button, Drawer, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
+import { AppBar, Box, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import HistoryIcon from '@mui/icons-material/History';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
 
 export default function MyAppBar() {
     const navigate = useNavigate();
     const [drawerOpen, setDrawerOpen] = React.useState(false);
-    const [auth, setAuth] = React.useState(true);
-
-    React.useEffect(() => {
-        console.debug("Initiating app bar...");
-        setAuth(false);
-    }, []);
 
     const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
         if (event.type === 'keydown' && ((event as React.KeyboardEvent).key === 'Tab' || (event as React.KeyboardEvent).key === 'Shift')) {
@@ -87,20 +80,6 @@ export default function MyAppBar() {
                     >
                         Pharmacy Stock Automation
                     </Typography>
-                    {/* {auth && (
-                        <IconButton
-                            size="large"
-                            aria-label="account of current user"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            color="inherit"
-                        >
-                            <AccountCircle />
-                        </IconButton>
-                    )}
-                    {!auth && (
-                        <Button color="inherit">Login</Button>
-                    )} */}
                 </Toolbar>
             </AppBar>
             <Drawer
