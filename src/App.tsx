@@ -6,6 +6,7 @@ import './App.css';
 import MyAppBar from './components/AppBar/AppBar';
 import PsaForm from './components/PsaForm/PsaForm';
 import TaskProgress from './components/TaskProgress/TaskProgress';
+import useAzurePubSubSocket from './hooks/useAzurePubSubSocket';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import TasksHistory from './components/TasksHistory/TasksHistory';
