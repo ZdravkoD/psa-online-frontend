@@ -13,6 +13,13 @@
         "get"
       ],
       "rewrite": "/"
+    },
+    {
+      "route": "/start-task",
+      "methods": [
+        "get"
+      ],
+      "rewrite": "/"
     }
   ]
 }
