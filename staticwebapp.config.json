@@ -1,0 +1,11 @@
+{
+  "routes": [
+    {
+      "route": "/tasks-history",
+      "methods": [
+        "get"
+      ],
+      "rewrite": "/index.html"
+    }
+  ]
+}
