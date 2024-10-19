@@ -11,7 +11,8 @@ import * as XLSX from 'xlsx';
 import excelLogo from '../../assets/icons/excel-logo.png';
 import downloadIcon from '../../assets/icons/download-file-icon.png';
 import debugIcon from '../../assets/icons/debug-icon.png';
-import { setTaskData } from '../../store/wsTaskData';
+import { setTaskData } from '../../store/tasks';
+import { Task } from '../../types/task';
 
 
 const API_BASE_URL = config.apiBaseUrl;
@@ -19,29 +20,18 @@ const API_BASE_URL = config.apiBaseUrl;
 const TaskProgress: React.FC = () => {
     const dispatch = useDispatch();
     const { taskId } = useParams<{ taskId: string }>();
-    const [progress, setProgress] = useState(0);
-    const [description, setDescription] = useState('');
-    const [status, setStatus] = useState('');
-    const [report, setReport] = useState<Record<string,any> | null>(null);
-    const [detailedErrorMessage, setDetailedErrorMessage] = useState('');
     const [inputFilename, setInputFilename] = useState('');
     const [expanded, setExpanded] = useState(false);
     const [imagesExpanded, setImagesExpanded] = useState(false);
     const [savedAmount, setSavedAmount] = useState(0);
-    const taskData = useSelector((state: RootState) => state.output.data);
+    const taskData: Task | null = useSelector((state: RootState) => taskId ? state.output.data[taskId] : null);
 
     useEffect(() => {
         const fetchTaskDetails = async () => {
             try {
                 const response = await fetch(`${API_BASE_URL}/task/${taskId}`);
                 const data = await response.json();
-                setProgress(data.status.progress);
-                setDescription(data.status.message);
-                setStatus(data.status.status);
-                setReport(data.report);
-                setDetailedErrorMessage(data.status.detailed_error_message || '');
                 setInputFilename(data.file_name);
-                console.log("Setting taskData: ", data);
                 dispatch(setTaskData(data));
             } catch (error) {
                 console.error('Error fetching task details:', error);
@@ -52,19 +42,7 @@ const TaskProgress: React.FC = () => {
     }, [taskId, dispatch]);
 
     useEffect(() => {
-        console.log('TaskData:', taskData);
-        if (!taskData) {
-            return;
-        }
-        setProgress(taskData.status.progress);
-        setDescription(taskData.status.message);
-        setStatus(taskData.status.status);
-        setReport(taskData.report);
-        setDetailedErrorMessage(taskData.status.detailed_error_message || '');
-    }, [taskData]);
-
-    useEffect(() => {
-        if (!report || !report["bought_products"]) {
+        if (!taskData?.report || !taskData.report["bought_products"]) {
             return;
         }
         const calculateSavedAmount = (products: any[]) => {
@@ -79,15 +57,11 @@ const TaskProgress: React.FC = () => {
             }, 0);
         };
 
-        const savedAmount = calculateSavedAmount(report["bought_products"]);
+        const savedAmount = calculateSavedAmount(taskData.report["bought_products"]);
         setSavedAmount(savedAmount);
-    }, [report]);
+    }, [taskData?.report]);
 
-    const safeProgress = Math.min(100, Math.max(0, progress ? progress : 0));
-
-    console.debug(
-        `TaskProgress: progress=${progress}, description=${description}, status=${status}, detailed_error_message=${detailedErrorMessage}`
-    );
+    const safeProgress = Math.min(100, Math.max(0, taskData?.status.progress ? taskData.status.progress : 0));
 
     const handleErrorMessageExpandClick = () => {
         setExpanded(!expanded);
@@ -95,16 +69,16 @@ const TaskProgress: React.FC = () => {
 
     let descriptionObject: Record<string, any> | null = null;
     try {
-        descriptionObject = JSON.parse(description) as Record<string, any>;
+        descriptionObject = JSON.parse(taskData?.status.message ? taskData.status.message : "") as Record<string, any>;
     } catch (error) {
         console.debug("Error parsing description to JSON: ", error);
     }
 
     const exportToExcel = () => {
-        if (!report) return;
+        if (!taskData?.report) return;
 
-        const boughtProducts = report["bought_products"] || [];
-        const unboughtProducts = report["unbought_products"] || [];
+        const boughtProducts = taskData.report.bought_products || [];
+        const unboughtProducts = taskData.report.unbought_products || [];
 
         const boughtProductsData = boughtProducts.map((product: any) => ({
             "Продукт": product.original_product_name,
@@ -167,20 +141,20 @@ const TaskProgress: React.FC = () => {
                         </Box>
                     )}
                     <Typography variant="h6" gutterBottom>
-                        {status === "in progress" ? "Прогрес на задачата" : "Резултат от задачата"}
+                        {taskData?.status.status === "in progress" ? "Прогрес на задачата" : "Резултат от задачата"}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                        {descriptionObject ? descriptionObject["original_product_name"] : description}
+                        {descriptionObject ? descriptionObject["original_product_name"] : taskData?.status.message}
                     </Typography>
                     <Box display="flex" alignItems="center">
                         <Box sx={{ width: '100%', mr: 1 }}>
-                            <LinearProgress variant="determinate" value={progress ? progress : 0} />
+                            <LinearProgress variant="determinate" value={taskData?.status.progress ? taskData.status.progress : 0} />
                         </Box>
                         <Box minWidth={35}>
                             <Typography variant="body2" color="text.secondary">{`${safeProgress}%`}</Typography>
                         </Box>
                     </Box>
-                    {detailedErrorMessage && (
+                    {taskData?.status.detailed_error_message && (
                         <Accordion expanded={expanded} onChange={handleErrorMessageExpandClick}>
                             <AccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
@@ -191,12 +165,12 @@ const TaskProgress: React.FC = () => {
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Typography color="error" style={{ whiteSpace: 'pre-wrap' }}>
-                                    {detailedErrorMessage}
+                                    {taskData?.status.detailed_error_message}
                                 </Typography>
                             </AccordionDetails>
                         </Accordion>
                     )}
-                    {status !== "success" && !detailedErrorMessage && !report && (
+                    {taskData?.status.status !== "success" && !taskData?.status.detailed_error_message && !taskData?.report && (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                             <CircularProgress />
                         </div>
@@ -205,14 +179,14 @@ const TaskProgress: React.FC = () => {
             </Container>
 
             <Container maxWidth="lg">
-                {status === "success" && report ? (
+                {taskData?.status.status === "success" && taskData?.report ? (
                     <>
                         <Box display="flex" justifyContent="center" mb={2}>
                             <Button variant="contained" color="primary" onClick={exportToExcel} startIcon={<img src={excelLogo} alt="Excel Logo" style={{ width: 24, height: 'auto' }} />}>
                                 Експорт към Excel
                             </Button>
                         </Box>
-                        <BoughtProductsTable products={report["bought_products"]} />
+                        <BoughtProductsTable products={taskData.report.bought_products} />
                         <Box display="flex" justifyContent="flex-end" mb={2}>
                             <Tooltip title="Това е общата сума на спестените пари от закупуване на продукти на най-ниската налична цена от различни дистрибутори.">
                                 <Typography variant="body1" color="text.primary">
@@ -220,10 +194,10 @@ const TaskProgress: React.FC = () => {
                                 </Typography>
                             </Tooltip>
                         </Box>
-                        <UnboughtProductsTable products={report["unbought_products"]} />
+                        <UnboughtProductsTable products={taskData.report.unbought_products} />
                     </>
                 ) : (
-                    status === "success" && (
+                    taskData?.status.status === "success" && (
                         <Typography variant="body1" color="text.secondary" style={{ display: 'flex', justifyContent: 'center', alignItems: 'top', height: '100vh' }}>
                             Задачата е завършена, но липсва отчет.
                         </Typography>

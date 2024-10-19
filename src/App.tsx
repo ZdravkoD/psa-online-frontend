@@ -10,7 +10,7 @@ import useAzurePubSubSocket from './hooks/useAzurePubSubSocket';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import TasksHistory from './components/TasksHistory/TasksHistory';
-import { setTaskData } from './store/wsTaskData';
+import { setTaskData } from './store/tasks';
 
 
 const App: React.FC = () => {
@@ -25,8 +25,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     console.debug("Azure Pub/Sub socket connected...");
-    if (outputs.taskData) {
-      dispatch(setTaskData(outputs.taskData)); // Dispatch to Redux
+    if (outputs.task) {
+      dispatch(setTaskData(outputs.task)); // Dispatch to Redux
     }    
     setWsError(outputs.wsError as string);
     return () => {

@@ -1,6 +1,6 @@
 // src/store/store.ts
 import { configureStore } from '@reduxjs/toolkit';
-import outputReducer from './wsTaskData';
+import outputReducer from './tasks';
 
 const store = configureStore({
   reducer: {

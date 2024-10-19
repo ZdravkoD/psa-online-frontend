@@ -1,18 +1,24 @@
 import { useState, useEffect } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import config from '../config/config';
+import { Task } from '../types/task';
 
-// Export the TaskData interface
-export interface TaskData {
-  status: Record<string, any>;
-  report: Record<string, any>;
-  file_name: string;
-  image_urls?: string[];
-}
 
 // The hook
 function useAzurePubSubSocket() {
-  const [taskData, setTaskData] = useState<TaskData>({ status: {}, report: {}, file_name: '', image_urls: [] });
+  const [task, setTask] = useState<Task>({
+    id: '',
+    account_id: '',
+    file_name: '',
+    pharmacy_id: '',
+    distributors: [],
+    task_type: '',
+    date_created: '',
+    date_updated: '',
+    status: { status: '', message: '', progress: 0, detailed_error_message: null },
+    report: { bought_products: [], unbought_products: [] },
+    image_urls: null,
+  });
   const [wsError, setWsError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,12 +60,7 @@ function useAzurePubSubSocket() {
       setWsError(null);
       const data = JSON.parse(event.data);
       console.debug("Received data: ", data);
-      setTaskData({
-        status: data.status,
-        report: data.report,
-        file_name: data.file_name,
-        image_urls: data.image_urls,
-      });
+      setTask(data);
     };
 
     ws.onerror = (event) => {
@@ -69,7 +70,7 @@ function useAzurePubSubSocket() {
     return () => ws.close();
   }, []);
 
-  return { taskData, wsError };
+  return { task, wsError };
 }
 
 export default useAzurePubSubSocket;
