@@ -91,6 +91,7 @@ const TaskProgress: React.FC = () => {
 
         const unboughtProductsData = unboughtProducts.map((product: any) => ({
             "Списък с некупени продукти": product.product_name,
+            "Количество": product.quantity,
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(boughtProductsData, { header: ["Продукт", "Sting - име на продукт", "Sting - цена на продукт", "Phoenix - име на продукт", "Phoenix - цена на продукт", "Добавен в количката на"] });

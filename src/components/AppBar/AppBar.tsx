@@ -4,6 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import HistoryIcon from '@mui/icons-material/History';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from 'react-router-dom';
 
 export default function MyAppBar() {
@@ -47,6 +48,12 @@ export default function MyAppBar() {
                         <HistoryIcon />
                     </ListItemIcon>
                     <ListItemText primary="История" />
+                </ListItem>
+                <ListItem button onClick={() => handleNavigation('/product-names')}>
+                    <ListItemIcon>
+                        <ShoppingCartIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Имена на продукти" />
                 </ListItem>
             </List>
         </Box>

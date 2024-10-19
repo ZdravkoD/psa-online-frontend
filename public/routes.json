@@ -1,0 +1,30 @@
+[
+    {
+      "route": "/tasks-history",
+      "methods": [
+        "get"
+      ],
+      "rewrite": "/"
+    },
+    {
+      "route": "/task-progress/*",
+      "methods": [
+        "get"
+      ],
+      "rewrite": "/"
+    },
+    {
+      "route": "/start-task",
+      "methods": [
+        "get"
+      ],
+      "rewrite": "/"
+    },
+    {
+      "route": "/product-names",
+      "methods": [
+        "get"
+      ],
+      "rewrite": "/"
+    }
+  ]

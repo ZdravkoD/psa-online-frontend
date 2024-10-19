@@ -11,6 +11,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import TasksHistory from './components/TasksHistory/TasksHistory';
 import { setTaskData } from './store/tasks';
+import ProductDictionary from './components/ProductDictionary/ProductDictionary';
 
 
 const App: React.FC = () => {
@@ -43,6 +44,7 @@ const App: React.FC = () => {
           <Route path="/start-task" element={<PsaForm />} />
           <Route path="/task-progress/:taskId" element={<TaskProgress />} />
           <Route path="/tasks-history" element={<TasksHistory />} />
+          <Route path="/product-names" element={<ProductDictionary />} />
         </Routes>
         <Grid item sx={{ width: '100%', mb: 2 }} style={{ padding: 14 }}>
           {wsError && (
