@@ -36,36 +36,37 @@ const ProductDictionary: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [pendingSearchTerm, setPendingSearchTerm] = useState<string>('');
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageSize] = useState<number>(10);
     const [totalCount, setTotalCount] = useState<number>(0);
     const [httpError, setHttpError] = useState<string | null>(null);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const fetchProducts = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${API_BASE_URL}/product-names`, {
+                    params: {
+                        filter: JSON.stringify({ original_product_name: searchTerm }),
+                        skip: (currentPage - 1) * pageSize,
+                        limit: pageSize,
+                    },
+                });
+                setProducts(response.data.items);
+                setTotalCount(response.data.total_count);
+                setHttpError(null);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                setHttpError('Грешка при заявка на продуктите. Моля опитайте отново.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchProducts();
     }, [searchTerm, currentPage, pageSize]);
 
     const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-
-    const fetchProducts = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`${API_BASE_URL}/product-names`, {
-                params: {
-                    filter: JSON.stringify({ original_product_name: searchTerm }),
-                    skip: (currentPage - 1) * pageSize,
-                    limit: pageSize,
-                },
-            });
-            setProducts(response.data.items);
-            setTotalCount(response.data.total_count);
-            setHttpError(null);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            setHttpError('Грешка при заявка на продуктите. Моля опитайте отново.');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;

@@ -20,6 +20,13 @@
         "get"
       ],
       "rewrite": "/"
+    },
+    {
+      "route": "/product-names",
+      "methods": [
+        "get"
+      ],
+      "rewrite": "/"
     }
   ]
 }
