@@ -14,7 +14,7 @@ const UnboughtProductsTable: React.FC<UnboughtProductsTableProps> = (unboughtPro
     return (
         <TableContainer component={Paper} elevation={4} sx={{ mt: 4, mb: 4 }}>
             <Typography variant="h6" component="div" sx={{ padding: '16px', backgroundColor: '#f5f5f5', color: '#3f51b5' }}>
-                Списък с незакупени продукти
+                Списък с незакупени продукти  ({unboughtProductsTableProps.products.length})
             </Typography>            
             <Table sx={{ minWidth: 450 }} aria-label="unbought products table">
                 <TableHead>

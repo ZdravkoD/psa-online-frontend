@@ -24,7 +24,7 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
     return (
         <TableContainer component={Paper} elevation={4} sx={{ mt: 4, mb: 4 }}>
             <Typography variant="h6" component="div" sx={{ padding: '16px', backgroundColor: '#f5f5f5', color: '#3f51b5' }}>
-                Списък със закупени продукти
+                Списък със закупени продукти ({boughtProductsTableProps.products.length})
             </Typography>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
