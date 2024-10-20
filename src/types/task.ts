@@ -9,6 +9,7 @@ export interface TaskStatus {
     distributor: string;
     name: string;
     price: number;
+    is_on_promotion: boolean;
   }
   
   export interface TaskReportBoughtProduct {

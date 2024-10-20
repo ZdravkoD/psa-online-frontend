@@ -1,11 +1,13 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import StarIcon from '@mui/icons-material/Star';
 
 
 interface AllPharmacyProductInfos {
     distributor: string;
     name: string;
     price: number;
+    is_on_promotion: boolean;
 }
 
 interface BoughtProduct {
@@ -43,7 +45,9 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                                 {product.original_product_name}
                             </TableCell>
                             <TableCell align="right" sx={{ backgroundColor: product.bought_from_distributor === "Sting" ? '#ccffbc' : 'inherit' }}>
-                                {sting_info?.name || "N/A"}
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    {sting_info?.name || "N/A"} {sting_info?.name && sting_info.is_on_promotion ? <StarIcon style={{ color: '#ff0000' }}/> : ""}
+                                </div>
                             </TableCell>
                             <TableCell align="right" sx={{ minWidth: 50, backgroundColor: product.bought_from_distributor === "Sting" ? '#ccffbc' : 'inherit' }}>
                                 {sting_info.price > 0 ? `${sting_info.price} лв` : "N/A"}
