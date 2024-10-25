@@ -58,7 +58,7 @@ const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, 
         }
         const filteredAltNames = alternativeNames.filter((name) => !product.custom_product_name_variations.includes(name));
         setAltNames(filteredAltNames);
-    }, [product]);
+    }, [product, alternativeNames]);
 
     const handleCheckboxChange = async (name: string) => {
         try {

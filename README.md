@@ -1,6 +1,23 @@
 # psa-online-frontend
 React app for Pharmacy Stock Automation deployed to the Cloud.
 
+## Setup
+
+Install node v16.20.2
+Install npm 8.19.4
+
+Install Node dependencies:
+```bash
+npm install
+```
+
+Install and setup pre-commit hooks with husky:
+```bash
+npm install husky --save-dev
+npx husky-init
+npm install lint-staged --save-dev
+```
+
 ## Node version
 Check the .nvmrc file.
 
