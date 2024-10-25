@@ -52,7 +52,7 @@ function useAzurePubSubSocket() {
         setWsError(errorMessage);
         return `${config.pubsubUrl}/client/hubs/${hub_name}`;
       }
-    };
+    }
 
     const ws = new ReconnectingWebSocket(urlProvider);
     

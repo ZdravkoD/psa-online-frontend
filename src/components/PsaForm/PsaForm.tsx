@@ -136,7 +136,7 @@ export default function PsaForm() {
         }
         return;
       }
-    };
+    }
     
     return (
       <Container maxWidth="sm">
