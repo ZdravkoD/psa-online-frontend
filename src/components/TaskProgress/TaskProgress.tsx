@@ -13,6 +13,7 @@ import downloadIcon from '../../assets/icons/download-file-icon.png';
 import debugIcon from '../../assets/icons/debug-icon.png';
 import { setTaskData } from '../../store/tasks';
 import { Task } from '../../types/task';
+import { AllPharmacyProductInfos, BoughtProduct, UnboughtProduct } from '../../types/product';
 
 
 const API_BASE_URL = config.apiBaseUrl;
@@ -45,9 +46,9 @@ const TaskProgress: React.FC = () => {
         if (!taskData?.report || !taskData.report.bought_products) {
             return;
         }
-        const calculateSavedAmount = (products: any[]) => {
-            return products.reduce((total: number, product: any) => {
-                const prices = product.all_pharmacy_product_infos.map((info: any) => info.price).filter((price: number) => price !== undefined);
+        const calculateSavedAmount = (products: BoughtProduct[]) => {
+            return products.reduce((total: number, product: BoughtProduct) => {
+                const prices = product.all_pharmacy_product_infos.map((info: AllPharmacyProductInfos) => info.price).filter((price: number) => price !== undefined);
                 if (prices.length > 1) {
                     const maxPrice = Math.max(...prices);
                     const minPrice = Math.min(...prices);
@@ -67,9 +68,9 @@ const TaskProgress: React.FC = () => {
         setExpanded(!expanded);
     };
 
-    let descriptionObject: Record<string, any> | null = null;
+    let descriptionObject: Record<string, unknown> | null = null;
     try {
-        descriptionObject = JSON.parse(taskData?.status.message ? taskData.status.message : "") as Record<string, any>;
+        descriptionObject = JSON.parse(taskData?.status.message ? taskData.status.message : "") as Record<string, unknown>;
     } catch (error) {
         console.debug("Error parsing description to JSON: ", error);
     }
@@ -80,16 +81,16 @@ const TaskProgress: React.FC = () => {
         const boughtProducts = taskData.report.bought_products || [];
         const unboughtProducts = taskData.report.unbought_products || [];
 
-        const boughtProductsData = boughtProducts.map((product: any) => ({
+        const boughtProductsData = boughtProducts.map((product: BoughtProduct) => ({
             "Продукт": product.original_product_name,
-            "Sting - име на продукт": product.all_pharmacy_product_infos.filter((info: any) => info.distributor === "Sting")[0]?.name,
-            "Sting - цена на продукт": product.all_pharmacy_product_infos.filter((info: any) => info.distributor === "Sting")[0]?.price,
-            "Phoenix - име на продукт": product.all_pharmacy_product_infos.filter((info: any) => info.distributor === "Phoenix")[0]?.name,
-            "Phoenix - цена на продукт": product.all_pharmacy_product_infos.filter((info: any) => info.distributor === "Phoenix")[0]?.price,
+            "Sting - име на продукт": product.all_pharmacy_product_infos.filter((info: AllPharmacyProductInfos) => info.distributor === "Sting")[0]?.name,
+            "Sting - цена на продукт": product.all_pharmacy_product_infos.filter((info: AllPharmacyProductInfos) => info.distributor === "Sting")[0]?.price,
+            "Phoenix - име на продукт": product.all_pharmacy_product_infos.filter((info: AllPharmacyProductInfos) => info.distributor === "Phoenix")[0]?.name,
+            "Phoenix - цена на продукт": product.all_pharmacy_product_infos.filter((info: AllPharmacyProductInfos) => info.distributor === "Phoenix")[0]?.price,
             "Добавен в количката на": product.bought_from_distributor,
         }));
 
-        const unboughtProductsData = unboughtProducts.map((product: any) => ({
+        const unboughtProductsData = unboughtProducts.map((product: UnboughtProduct) => ({
             "Списък с некупени продукти": product.product_name,
             "Количество": product.quantity,
         }));
@@ -145,7 +146,7 @@ const TaskProgress: React.FC = () => {
                         {taskData?.status.status === "in progress" ? "Прогрес на задачата" : "Резултат от задачата"}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                        {descriptionObject ? descriptionObject["original_product_name"] : taskData?.status.message}
+                        {descriptionObject ? String(descriptionObject["original_product_name"]) : taskData?.status.message}
                     </Typography>
                     <Box display="flex" alignItems="center">
                         <Box sx={{ width: '100%', mr: 1 }}>

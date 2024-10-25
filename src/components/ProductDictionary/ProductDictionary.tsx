@@ -20,15 +20,9 @@ import {
 import config from "../../config/config";
 import { useParams } from "react-router-dom";
 import ReorderableList from "../ReordableList/ReordableList";
+import { Product } from "../../types/product";
 
 const API_BASE_URL = config.apiBaseUrl;
-
-interface Product {
-  id: string;
-  original_product_name: string;
-  generated_product_variations: string[];
-  custom_product_name_variations: string[];
-}
 
 const ProductDictionary: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);

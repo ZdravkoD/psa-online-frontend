@@ -11,12 +11,7 @@ import {
 } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import AlternativeNames from "../AlternativeNames/AlternativeNames";
-
-interface UnboughtProduct {
-  product_name: string;
-  quantity: number;
-  alternative_names: string[];
-}
+import { UnboughtProduct } from "../../types/product";
 
 interface UnboughtProductsTableProps {
   products: UnboughtProduct[];

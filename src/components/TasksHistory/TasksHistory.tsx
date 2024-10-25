@@ -17,8 +17,11 @@ interface Task {
     pharmacy_id: string;
     distributors: string[];
     task_type: string;
-    status: Record<string, any>;
-    report: Record<string, any>;
+    status: {
+        status: 'in progress' | 'success' | 'error';
+        message?: string;
+    };
+    report: Record<string, unknown>;
     date_created: string;
 }
 
@@ -28,7 +31,7 @@ const statusTranslations: Record<string, string> = {
     'error': 'Грешка',
 };
 
-const statusIcons: Record<string, any> = {
+const statusIcons: Record<string, string> = {
     'in progress': loadingIconGif,
     'success': greenCheckIcon,
     'error': redXIcon,

@@ -15,6 +15,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import axios from 'axios';
 import config from '../../config/config';
+import { Product } from '../../types/product';
 
 interface AlternativeNamesProps {
     open: boolean;
@@ -26,7 +27,7 @@ interface AlternativeNamesProps {
 const API_BASE_URL = config.apiBaseUrl;
 
 const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, alternativeNames, onClose }) => {
-    const [product, setProduct] = useState<any>(null);
+    const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [altNames, setAltNames] = useState<string[]>(alternativeNames);
 
@@ -62,8 +63,8 @@ const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, 
 
     const handleCheckboxChange = async (name: string) => {
         try {
-            const updatedProduct = await axios.patch(`${API_BASE_URL}/product/${product.id}`, {
-                custom_product_name_variations: [...product.custom_product_name_variations, name],
+            const updatedProduct = await axios.patch(`${API_BASE_URL}/product/${product?.id}`, {
+                custom_product_name_variations: [...(product?.custom_product_name_variations || []), name],
             });
             setAltNames((prev) => prev.filter((n) => n !== name));
             setProduct(updatedProduct.data);

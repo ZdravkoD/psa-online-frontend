@@ -16,6 +16,7 @@ import { CssBaseline, IconButton } from '@mui/material';
 interface SortableItemProps {
     id: string;
     text: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     secondaryAction: any;
 }
 

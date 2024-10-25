@@ -3,25 +3,8 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import StarIcon from '@mui/icons-material/Star';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import AlternativeNames from '../AlternativeNames/AlternativeNames';
+import { BoughtProductsTableProps } from '../../types/product';
 
-
-interface AllPharmacyProductInfos {
-    distributor: string;
-    name: string;
-    price: number;
-    is_on_promotion: boolean;
-    alternative_names: string[];
-}
-
-interface BoughtProduct {
-    original_product_name: string;
-    bought_from_distributor: string;
-    all_pharmacy_product_infos: AllPharmacyProductInfos[];
-}
-
-interface BoughtProductsTableProps {
-    products: BoughtProduct[];
-}
 
 const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsTableProps) => {
     const [isAlternativeNamesDrawerOpen, setAlternativeNamesDrawerOpen] = useState(false);
