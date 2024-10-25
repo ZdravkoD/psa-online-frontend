@@ -53,7 +53,7 @@ export default function MyAppBar() {
                     <ListItemIcon>
                         <ShoppingCartIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Имена на продукти" />
+                    <ListItemText primary="Продукти" />
                 </ListItem>
             </List>
         </Box>

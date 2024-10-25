@@ -10,6 +10,7 @@ export interface TaskStatus {
     name: string;
     price: number;
     is_on_promotion: boolean;
+    alternative_names: string[];
   }
   
   export interface TaskReportBoughtProduct {
@@ -21,6 +22,7 @@ export interface TaskStatus {
   export interface TaskReportUnboughtProduct {
     product_name: string;
     quantity: number;
+    alternative_names: string[];
   }
   
   export interface TaskReport {

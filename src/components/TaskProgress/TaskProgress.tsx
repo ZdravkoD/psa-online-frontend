@@ -42,7 +42,7 @@ const TaskProgress: React.FC = () => {
     }, [taskId, dispatch]);
 
     useEffect(() => {
-        if (!taskData?.report || !taskData.report["bought_products"]) {
+        if (!taskData?.report || !taskData.report.bought_products) {
             return;
         }
         const calculateSavedAmount = (products: any[]) => {
@@ -57,7 +57,7 @@ const TaskProgress: React.FC = () => {
             }, 0);
         };
 
-        const savedAmount = calculateSavedAmount(taskData.report["bought_products"]);
+        const savedAmount = calculateSavedAmount(taskData.report.bought_products);
         setSavedAmount(savedAmount);
     }, [taskData?.report]);
 

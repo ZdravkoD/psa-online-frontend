@@ -59,7 +59,7 @@ const TasksHistory: React.FC = () => {
         const fetchTasks = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(`${API_BASE_URL}/tasks?skip=${skip}&limit=${limit}&sort={"date_created":-1}`);
+                const response = await axios.get(`${API_BASE_URL}/tasks?skip=${skip}&limit=${limit}&sort={"date_created":-1}&projection={"id":1,"file_name":1,"status":1,"pharmacy_id":1,"date_created":1}`);
                 const filteredTasks = response.data.filter((task: Task) => task.status);
                 setTasks(prevTasks => [...prevTasks, ...filteredTasks]);
                 setHasMore(response.data.length === limit);

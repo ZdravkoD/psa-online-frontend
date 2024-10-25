@@ -44,7 +44,7 @@ const App: React.FC = () => {
           <Route path="/start-task" element={<PsaForm />} />
           <Route path="/task-progress/:taskId" element={<TaskProgress />} />
           <Route path="/tasks-history" element={<TasksHistory />} />
-          <Route path="/product-names" element={<ProductDictionary />} />
+          <Route path="/product-names/:searchTermParam?" element={<ProductDictionary />} />
         </Routes>
         <Grid item sx={{ width: '100%', mb: 2 }} style={{ padding: 14 }}>
           {wsError && (

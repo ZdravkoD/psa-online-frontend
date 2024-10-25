@@ -19,7 +19,11 @@ import {
     CircularProgress,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ReorderIcon from '@mui/icons-material/Reorder';
 import config from '../../config/config';
+import { useParams } from 'react-router-dom';
+import ReorderableList from '../ReordableList/ReordableList';
+
 
 const API_BASE_URL = config.apiBaseUrl;
 
@@ -39,13 +43,21 @@ const ProductDictionary: React.FC = () => {
     const [pageSize] = useState<number>(10);
     const [totalCount, setTotalCount] = useState<number>(0);
     const [httpError, setHttpError] = useState<string | null>(null);
+    const { searchTermParam } = useParams<{ searchTermParam: string }>();
+
+    useEffect(() => {
+        if (searchTermParam) {
+            setPendingSearchTerm(searchTermParam);
+            handleSearch({ target: { value: searchTermParam } } as React.ChangeEvent<HTMLInputElement>);
+        }
+    }, [searchTermParam]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(`${API_BASE_URL}/product-names`, {
+                const response = await axios.get(`${API_BASE_URL}/products`, {
                     params: {
                         filter: JSON.stringify({ original_product_name: searchTerm }),
                         skip: (currentPage - 1) * pageSize,
@@ -81,10 +93,9 @@ const ProductDictionary: React.FC = () => {
         }, 500);
     };
 
-    const handleCustomVariationsChange = async (id: string, variations: string[]) => {
+    const handleCustomVariationsChange = async (id: string, variations: string[]): Promise<Error | void> => {
         try {
-            const modifiedProduct = await axios.patch(`${API_BASE_URL}/product-names`, {
-                id,
+            const modifiedProduct = await axios.patch(`${API_BASE_URL}/product/${id}`, {
                 custom_product_name_variations: variations,
             });
             setProducts(products.map((product) => (product.id === id ? modifiedProduct.data : product)));
@@ -92,7 +103,9 @@ const ProductDictionary: React.FC = () => {
         } catch (error) {
             console.error('Error updating custom variations:', error);
             setHttpError('Грешка при актуализиране на персонализираните вариации');
+            return Promise.reject(error);
         }
+        return Promise.resolve();
     };
 
     return (
@@ -115,7 +128,7 @@ const ProductDictionary: React.FC = () => {
             />
             <TableContainer component={Paper} elevation={4} sx={{ mt: 4, mb: 4 }}>
                 <Typography variant="h6" component="div" sx={{ padding: '16px', backgroundColor: '#f5f5f5', color: '#3f51b5', display: 'flex', alignItems: 'center' }}>
-                    Имена на продукти {loading && (
+                    Продукти {loading && (
                         <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10px' }}>
                             <CircularProgress size={24} />
                         </div>
@@ -144,37 +157,33 @@ const ProductDictionary: React.FC = () => {
                             </List>
                         </TableCell>
                         <TableCell>
-                            <List>
-                                {product.custom_product_name_variations.map((variation, index) => (
-                                    <ListItem key={index} secondaryAction={
-                                    <IconButton edge="end" aria-label="delete" onClick={() => {
-                                        const newVariations = product.custom_product_name_variations.filter((_, i) => i !== index);
-                                        handleCustomVariationsChange(product.id, newVariations);
-                                    }}>
-                                        <DeleteIcon />
-                                    </IconButton>
-                                    }>
-                                    <ListItemText primary={variation} />
-                                    </ListItem>
-                                ))}
-                                <ListItem>
-                                    <TextField
-                                    placeholder="Add new variation"
-                                    onKeyDown={(e) => {
-                                        console.log("textField onKeyDown value: ", (e.target as HTMLInputElement).value);
-                                        console.log("textField onKeyDown key: ", e.key);
-                                        const inputValue = (e.target as HTMLInputElement)?.value?.trim();
-                                        if (e.key === 'Enter' && inputValue !== '') {
-                                        const newVariations = [...product.custom_product_name_variations, inputValue];
-                                        handleCustomVariationsChange(product.id, newVariations);
-                                        (e.target as HTMLInputElement).value = '';
+                            <ReorderableList
+                                initialItems={product.custom_product_name_variations.map((variation, index) => ({ id: index.toString(), text: variation }))}
+                                onReorder={async (newOrder: { id: string; text: string }[]) => { 
+                                    try {
+                                        await handleCustomVariationsChange(product.id, newOrder.map((v) => v.text));
+                                    } catch (error) {
+                                        console.error('Error reordering custom variations:', error);
+                                    }
+                                }}
+                            />
+                            <TextField
+                                placeholder="Add new variation"
+                                onKeyDown={async (e) => {
+                                    const inputValue = (e.target as HTMLInputElement)?.value?.trim();
+                                    if (e.key === 'Enter' && inputValue !== '') {
+                                        try {
+                                            const newVariations = [...product.custom_product_name_variations, inputValue];
+                                            await handleCustomVariationsChange(product.id, newVariations);
+                                            (e.target as HTMLInputElement).value = '';
+                                        } catch (error) {
+                                            console.error('Error adding new variation:', error);
                                         }
-                                    }}
-                                    variant="standard"
-                                    fullWidth
-                                    />
-                                </ListItem>
-                            </List>
+                                    }
+                                }}
+                                variant="standard"
+                                fullWidth
+                            />
                         </TableCell>
                         </TableRow>
                     ))}
