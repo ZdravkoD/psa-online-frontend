@@ -20,8 +20,7 @@ interface UnboughtProductsTableProps {
 const UnboughtProductsTable: React.FC<UnboughtProductsTableProps> = (
   unboughtProductsTableProps
 ) => {
-  const [isAlternativeNamesDrawerOpen, setAlternativeNamesDrawerOpen] =
-    useState(false);
+  const [openProduct, setOpenProduct] = useState<string | null>(null);
 
   return (
     <TableContainer component={Paper} elevation={4} sx={{ mt: 4, mb: 4 }}>
@@ -63,24 +62,24 @@ const UnboughtProductsTable: React.FC<UnboughtProductsTableProps> = (
                     <>
                       <div>
                         <button
-                          onClick={() => setAlternativeNamesDrawerOpen(true)}
+                          onClick={() => setOpenProduct(product.product_name)}
                           style={{
-                            marginLeft: "8px",
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
+                          marginLeft: "8px",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
                           }}
                         >
                           <Typography variant="body2" color="error">
-                            <AddShoppingCartIcon />
+                          <AddShoppingCartIcon />
                           </Typography>
                         </button>
-                        {isAlternativeNamesDrawerOpen && (
+                        {openProduct === product.product_name && (
                           <AlternativeNames
-                            open={isAlternativeNamesDrawerOpen}
-                            onClose={() => setAlternativeNamesDrawerOpen(false)}
-                            productName={product.product_name}
-                            alternativeNames={product.alternative_names || []}
+                          open={openProduct === product.product_name}
+                          onClose={() => setOpenProduct(null)}
+                          productName={product.product_name}
+                          alternativeNames={product.alternative_names || []}
                           />
                         )}
                       </div>

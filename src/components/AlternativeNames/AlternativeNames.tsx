@@ -80,7 +80,7 @@ const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, 
                     <CloseIcon />
                 </IconButton>
                 {loading || !product ? (
-                    <Backdrop open={loading} style={{ zIndex: 1 }}>
+                    <Backdrop open={loading} style={{ zIndex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                         <CircularProgress />
                     </Backdrop>
                 ) : (

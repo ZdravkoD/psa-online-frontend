@@ -7,7 +7,7 @@ import { BoughtProductsTableProps } from '../../types/product';
 
 
 const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsTableProps) => {
-    const [isAlternativeNamesDrawerOpen, setAlternativeNamesDrawerOpen] = useState(false);
+    const [openProduct, setOpenProduct] = useState<string | null>(null);
     
     return (
         <TableContainer component={Paper} elevation={4} sx={{ mt: 4, mb: 4 }}>
@@ -38,15 +38,15 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                                     {sting_info?.name === "" && sting_info.alternative_names && (
                                         <>
                                             <div>
-                                                <button onClick={() => setAlternativeNamesDrawerOpen(true)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                                <button onClick={() => setOpenProduct(product.original_product_name)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
                                                     <Typography variant="body2" color="error">
                                                         <AddShoppingCartIcon />
                                                     </Typography>
                                                 </button>
-                                                {isAlternativeNamesDrawerOpen && (
+                                                {openProduct === product.original_product_name && (
                                                     <AlternativeNames 
-                                                        open={isAlternativeNamesDrawerOpen} 
-                                                        onClose={() => setAlternativeNamesDrawerOpen(false)} 
+                                                        open={openProduct === product.original_product_name} 
+                                                        onClose={() => setOpenProduct(null)} 
                                                         productName={product.original_product_name}
                                                         alternativeNames={sting_info.alternative_names || []}
                                                     />
@@ -65,15 +65,15 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                                     {phoenix_info?.name === "" && phoenix_info.alternative_names && (
                                         <>
                                             <div>
-                                                <button onClick={() => setAlternativeNamesDrawerOpen(true)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                                <button onClick={() => setOpenProduct(product.original_product_name)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
                                                     <Typography variant="body2" color="error">
                                                         <AddShoppingCartIcon />
                                                     </Typography>
                                                 </button>
-                                                {isAlternativeNamesDrawerOpen && (
+                                                {openProduct === product.original_product_name && (
                                                     <AlternativeNames 
-                                                        open={isAlternativeNamesDrawerOpen} 
-                                                        onClose={() => setAlternativeNamesDrawerOpen(false)} 
+                                                        open={openProduct === product.original_product_name} 
+                                                        onClose={() => setOpenProduct(null)} 
                                                         productName={product.original_product_name}
                                                         alternativeNames={phoenix_info.alternative_names || []}
                                                     />
