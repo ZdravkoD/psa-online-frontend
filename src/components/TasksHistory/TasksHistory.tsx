@@ -9,6 +9,8 @@ import greenCheckIcon from '../../assets/icons/green-check-icon.png';
 import loadingIconGif from '../../assets/icons/loading-icon.gif';
 
 const API_BASE_URL = config.apiBaseUrl;
+const PAGE_SIZE = 10;
+const INITIAL_PAGE_SIZE = 30;
 
 interface Task {
     id: string;
@@ -40,7 +42,7 @@ const statusIcons: Record<string, string> = {
 const TasksHistory: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [skip, setSkip] = useState(0);
-    const [limit] = useState(10);
+    const [limit] = useState(INITIAL_PAGE_SIZE);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const navigate = useNavigate();
@@ -62,10 +64,16 @@ const TasksHistory: React.FC = () => {
         const fetchTasks = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(`${API_BASE_URL}/tasks?skip=${skip}&limit=${limit}&sort={"date_created":-1}&projection={"id":1,"file_name":1,"status":1,"pharmacy_id":1,"date_created":1}`);
+                let reqSkip = skip;
+                let reqLimit = INITIAL_PAGE_SIZE;
+                if (reqSkip > 0) {
+                    reqSkip += INITIAL_PAGE_SIZE - PAGE_SIZE;
+                    reqLimit = PAGE_SIZE;
+                }
+                const response = await axios.get(`${API_BASE_URL}/tasks?skip=${reqSkip}&limit=${reqLimit}&sort={"date_created":-1}&projection={"id":1,"file_name":1,"status":1,"pharmacy_id":1,"date_created":1}`);
                 const filteredTasks = response.data.filter((task: Task) => task.status);
                 setTasks(prevTasks => [...prevTasks, ...filteredTasks]);
-                setHasMore(response.data.length === limit);
+                setHasMore(response.data.length === reqLimit);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
             } finally {
@@ -78,7 +86,7 @@ const TasksHistory: React.FC = () => {
 
     const loadMoreTasks = () => {
         if (hasMore && !loading) {
-            setSkip(prevSkip => prevSkip + limit);
+            setSkip(prevSkip => prevSkip + PAGE_SIZE);
         }
     };
 
