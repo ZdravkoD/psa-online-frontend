@@ -64,7 +64,7 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                                     </div>
                                 </TableCell>
                                 <TableCell align="right" sx={{ minWidth: 50, backgroundColor: product.bought_from_distributor === "Sting" ? '#ccffbc' : 'inherit' }}>
-                                    {sting_info.price > 0 ? `${sting_info.price} лв` : "N/A"}
+                                    {sting_info.price > 0 ? `${sting_info.price} €` : "N/A"}
                                 </TableCell>
                                 <TableCell align="right" sx={{ backgroundColor: product.bought_from_distributor === "Phoenix" ? '#ccffbc' : (phoenix_info?.name === "" && phoenix_info.alternative_names ? "#00ffff" : 'inherit') }}>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -91,7 +91,7 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                                     </div>
                                 </TableCell>
                                 <TableCell align="right" sx={{ minWidth: 50, backgroundColor: product.bought_from_distributor === "Phoenix" ? '#ccffbc' : (phoenix_info?.name === "" && phoenix_info.alternative_names ? "#00ffff" : 'inherit') }}>
-                                    {phoenix_info.price > 0 ? `${phoenix_info.price} лв` : "N/A"}
+                                    {phoenix_info.price > 0 ? `${phoenix_info.price} €` : "N/A"}
                                 </TableCell>
                             </TableRow>)
                         })}

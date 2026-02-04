@@ -192,7 +192,7 @@ const TaskProgress: React.FC = () => {
                         <Box display="flex" justifyContent="flex-end" mb={2}>
                             <Tooltip title="Това е общата сума на спестените пари от закупуване на продукти на най-ниската налична цена от различни дистрибутори.">
                                 <Typography variant="body1" color="text.primary">
-                                    Обща сума на спестените пари: <strong>{savedAmount.toFixed(2)} лв.</strong>
+                                    Обща сума на спестените пари: <strong>{savedAmount.toFixed(2)} €</strong>
                                 </Typography>
                             </Tooltip>
                         </Box>
