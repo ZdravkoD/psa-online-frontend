@@ -130,16 +130,11 @@ const TaskProgress: React.FC = () => {
             <Container maxWidth="sm">
                 <Box sx={{ width: '100%', mb: 2 }}>
                     {inputFilename && (
-                        <Box display="flex" justifyContent="center" mb={2} flexDirection="column" alignItems="center">
+                        <Box display="flex" justifyContent="center" mb={2} flexDirection="row" alignItems="center">
                             <Typography variant="h5" gutterBottom>
                                 Начален файл: <strong>{inputFilename}</strong>
                             </Typography>
-                            {taskData?.pharmacy_id && (
-                                <Typography variant="h6" gutterBottom>
-                                    Аптека: <strong>{pharmacies.find(pharmacy => pharmacy.pharmacy_id === taskData.pharmacy_id)?.display_name || "Неизвестна аптека"}</strong>
-                                </Typography>
-                            )}
-                            <Box mt={1}>
+                            <Box ml={2}>
                                 <Button
                                     variant="contained"
                                     color="primary"
@@ -150,6 +145,11 @@ const TaskProgress: React.FC = () => {
                                 </Button>
                             </Box>
                         </Box>
+                    )}
+                    {taskData?.pharmacy_id && (
+                        <Typography variant="h6" gutterBottom>
+                            Аптека: <strong>{pharmacies.find(pharmacy => pharmacy.pharmacy_id === taskData.pharmacy_id)?.display_name || "Неизвестна аптека"}</strong>
+                        </Typography>
                     )}
                     <Typography variant="h6" gutterBottom>
                         {taskData?.status.status === "in progress" ? "Прогрес на задачата" : "Резултат от задачата"}
