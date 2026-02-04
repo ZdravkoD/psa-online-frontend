@@ -14,6 +14,7 @@ import debugIcon from '../../assets/icons/debug-icon.png';
 import { setTaskData } from '../../store/tasks';
 import { Task } from '../../types/task';
 import { AllPharmacyProductInfos, BoughtProduct, UnboughtProduct } from '../../types/product';
+import useFetchInitData from '../../hooks/useFetchInitData';
 
 
 const API_BASE_URL = config.apiBaseUrl;
@@ -26,6 +27,9 @@ const TaskProgress: React.FC = () => {
     const [imagesExpanded, setImagesExpanded] = useState(false);
     const [savedAmount, setSavedAmount] = useState(0);
     const taskData: Task | null = useSelector((state: RootState) => taskId ? state.output.data[taskId] : null);
+
+    // Fetch pharmacy data using the useFetchInitData hook
+    const { pharmacies } = useFetchInitData();
 
     useEffect(() => {
         const fetchTaskDetails = async () => {
@@ -126,11 +130,16 @@ const TaskProgress: React.FC = () => {
             <Container maxWidth="sm">
                 <Box sx={{ width: '100%', mb: 2 }}>
                     {inputFilename && (
-                        <Box display="flex" justifyContent="center" mb={2}>
+                        <Box display="flex" justifyContent="center" mb={2} flexDirection="column" alignItems="center">
                             <Typography variant="h5" gutterBottom>
                                 Начален файл: <strong>{inputFilename}</strong>
                             </Typography>
-                            <Box ml={2}>
+                            {taskData?.pharmacy_id && (
+                                <Typography variant="h6" gutterBottom>
+                                    Аптека: <strong>{pharmacies.find(pharmacy => pharmacy.pharmacy_id === taskData.pharmacy_id)?.display_name || "Неизвестна аптека"}</strong>
+                                </Typography>
+                            )}
+                            <Box mt={1}>
                                 <Button
                                     variant="contained"
                                     color="primary"
