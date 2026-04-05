@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Collapse, IconButton } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Collapse, IconButton, Tooltip } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import AlternativeNames from '../AlternativeNames/AlternativeNames';
@@ -15,6 +15,8 @@ import {
 const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsTableProps) => {
     const [openProduct, setOpenProduct] = useState<string | null>(null);
     const [tableExpanded, setTableExpanded] = useState<boolean>(true);
+    const alternativeNamesTooltip =
+        'Тази синя клетка означава, че продуктът не е намерен с директно съвпадение, но има предложени алтернативни имена. Натиснете иконата за преглед.';
     const distributors = getDistributorNames(
         boughtProductsTableProps.distributors,
         boughtProductsTableProps.products
@@ -63,33 +65,49 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
 
                                     return (
                                         <React.Fragment key={`${product.original_product_name}-${distributor}`}>
-                                            <TableCell align="right" sx={{ backgroundColor }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {productInfo?.name || 'N/A'} {productInfo?.name && productInfo.is_on_promotion ? <StarIcon style={{ color: '#ff0000' }}/> : ''}
-                                                    {hasAlternativeNames && (
-                                                        <>
-                                                            <div>
-                                                                <button onClick={() => setOpenProduct(product.original_product_name)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                                                    <Typography variant="body2" color="error">
-                                                                        <AddShoppingCartIcon />
-                                                                    </Typography>
-                                                                </button>
-                                                                {openProduct === product.original_product_name && (
-                                                                    <AlternativeNames 
-                                                                        open={openProduct === product.original_product_name} 
-                                                                        onClose={() => setOpenProduct(null)} 
-                                                                        productName={product.original_product_name}
-                                                                        alternativeNames={productInfo.alternative_names || []}
-                                                                    />
-                                                                )}
-                                                            </div>
-                                                        </>
-                                                    )}                                    
-                                                </div>
-                                            </TableCell>
-                                            <TableCell align="right" sx={{ minWidth: 50, backgroundColor }}>
-                                                {productInfo.price > 0 ? `${productInfo.price} €` : 'N/A'}
-                                            </TableCell>
+                                            <Tooltip
+                                                title={hasAlternativeNames ? alternativeNamesTooltip : ''}
+                                                arrow
+                                            >
+                                                <TableCell align="right" sx={{ backgroundColor, cursor: hasAlternativeNames ? 'help' : 'default' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        {productInfo?.name || 'N/A'} {productInfo?.name && productInfo.is_on_promotion ? <StarIcon style={{ color: '#ff0000' }}/> : ''}
+                                                        {hasAlternativeNames && (
+                                                            <>
+                                                                <div>
+                                                                    <Tooltip title="Покажи предложените алтернативни имена" arrow>
+                                                                        <button
+                                                                            aria-label="Покажи предложените алтернативни имена"
+                                                                            onClick={() => setOpenProduct(product.original_product_name)}
+                                                                            style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}
+                                                                        >
+                                                                            <Typography variant="body2" color="error">
+                                                                                <AddShoppingCartIcon />
+                                                                            </Typography>
+                                                                        </button>
+                                                                    </Tooltip>
+                                                                    {openProduct === product.original_product_name && (
+                                                                        <AlternativeNames 
+                                                                            open={openProduct === product.original_product_name} 
+                                                                            onClose={() => setOpenProduct(null)} 
+                                                                            productName={product.original_product_name}
+                                                                            alternativeNames={productInfo.alternative_names || []}
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            </>
+                                                        )}                                    
+                                                    </div>
+                                                </TableCell>
+                                            </Tooltip>
+                                            <Tooltip
+                                                title={hasAlternativeNames ? alternativeNamesTooltip : ''}
+                                                arrow
+                                            >
+                                                <TableCell align="right" sx={{ minWidth: 50, backgroundColor, cursor: hasAlternativeNames ? 'help' : 'default' }}>
+                                                    {productInfo.price > 0 ? `${productInfo.price} €` : 'N/A'}
+                                                </TableCell>
+                                            </Tooltip>
                                         </React.Fragment>
                                     );
                                 })}
