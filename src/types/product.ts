@@ -21,6 +21,7 @@ export interface BoughtProduct {
 
 export interface BoughtProductsTableProps {
   products: BoughtProduct[];
+  distributors?: string[];
 }
 
 export interface UnboughtProduct {

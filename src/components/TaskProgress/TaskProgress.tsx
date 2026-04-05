@@ -13,8 +13,14 @@ import downloadIcon from '../../assets/icons/download-file-icon.png';
 import debugIcon from '../../assets/icons/debug-icon.png';
 import { setTaskData } from '../../store/tasks';
 import { Task } from '../../types/task';
-import { AllPharmacyProductInfos, BoughtProduct, UnboughtProduct } from '../../types/product';
+import { AllPharmacyProductInfos, BoughtProduct } from '../../types/product';
 import useFetchInitData from '../../hooks/useFetchInitData';
+import {
+    buildBoughtProductsExportRows,
+    buildUnboughtProductsExportRows,
+    getBoughtProductsExportHeaders,
+    getDistributorNames,
+} from '../../utils/report';
 
 
 const API_BASE_URL = config.apiBaseUrl;
@@ -27,6 +33,10 @@ const TaskProgress: React.FC = () => {
     const [imagesExpanded, setImagesExpanded] = useState(false);
     const [savedAmount, setSavedAmount] = useState(0);
     const taskData: Task | null = useSelector((state: RootState) => taskId ? state.output.data[taskId] : null);
+    const reportDistributors = getDistributorNames(
+        taskData?.distributors,
+        taskData?.report?.bought_products ?? []
+    );
 
     // Fetch pharmacy data using the useFetchInitData hook
     const { pharmacies } = useFetchInitData();
@@ -85,30 +95,15 @@ const TaskProgress: React.FC = () => {
         const boughtProducts = taskData.report.bought_products || [];
         const unboughtProducts = taskData.report.unbought_products || [];
 
-        const boughtProductsData = boughtProducts.map((product: BoughtProduct) => ({
-            "Продукт": product.original_product_name,
-            "Sting - име на продукт": product.all_pharmacy_product_infos.filter((info: AllPharmacyProductInfos) => info.distributor === "Sting")[0]?.name,
-            "Sting - цена на продукт": product.all_pharmacy_product_infos.filter((info: AllPharmacyProductInfos) => info.distributor === "Sting")[0]?.price,
-            "Phoenix - име на продукт": product.all_pharmacy_product_infos.filter((info: AllPharmacyProductInfos) => info.distributor === "Phoenix")[0]?.name,
-            "Phoenix - цена на продукт": product.all_pharmacy_product_infos.filter((info: AllPharmacyProductInfos) => info.distributor === "Phoenix")[0]?.price,
-            "Добавен в количката на": product.bought_from_distributor,
-        }));
-
-        const unboughtProductsData = unboughtProducts.map((product: UnboughtProduct) => ({
-            "Списък с некупени продукти": product.product_name,
-            "Количество": product.quantity,
-        }));
-
-        const worksheet = XLSX.utils.json_to_sheet(boughtProductsData, { header: ["Продукт", "Sting - име на продукт", "Sting - цена на продукт", "Phoenix - име на продукт", "Phoenix - цена на продукт", "Добавен в количката на"] });
+        const boughtProductsData = buildBoughtProductsExportRows(
+            boughtProducts,
+            reportDistributors
+        );
+        const unboughtProductsData = buildUnboughtProductsExportRows(unboughtProducts);
+        const exportHeaders = getBoughtProductsExportHeaders(reportDistributors);
+        const worksheet = XLSX.utils.json_to_sheet(boughtProductsData, { header: exportHeaders });
         // Set column widths to 210 pixels
-        const columnWidths = [
-            { wpx: 210 }, // Продукт
-            { wpx: 210 }, // Sting - име на продукт
-            { wpx: 210 }, // Sting - цена на продукт 
-            { wpx: 210 }, // Phoenix - име на продукт
-            { wpx: 210 }, // Phoenix - цена на продукт
-            { wpx: 210 }, // Добавен в количката на
-        ];
+        const columnWidths = exportHeaders.map(() => ({ wpx: 210 }));
         worksheet['!cols'] = columnWidths;
 
         // Insert an empty row between the two tables
@@ -197,7 +192,10 @@ const TaskProgress: React.FC = () => {
                                 Експорт към Excel
                             </Button>
                         </Box>
-                        <BoughtProductsTable products={taskData.report.bought_products} />
+                        <BoughtProductsTable
+                            products={taskData.report.bought_products}
+                            distributors={reportDistributors}
+                        />
                         <Box display="flex" justifyContent="flex-end" mb={2}>
                             <Tooltip title="Това е общата сума на спестените пари от закупуване на продукти на най-ниската налична цена от различни дистрибутори.">
                                 <Typography variant="body1" color="text.primary">

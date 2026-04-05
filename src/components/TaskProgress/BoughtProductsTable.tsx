@@ -6,11 +6,19 @@ import AlternativeNames from '../AlternativeNames/AlternativeNames';
 import { BoughtProductsTableProps } from '../../types/product';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import {
+    getDistributorNames,
+    getProductInfoByDistributor,
+} from '../../utils/report';
 
 
 const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsTableProps) => {
     const [openProduct, setOpenProduct] = useState<string | null>(null);
     const [tableExpanded, setTableExpanded] = useState<boolean>(true);
+    const distributors = getDistributorNames(
+        boughtProductsTableProps.distributors,
+        boughtProductsTableProps.products
+    );
     
     return (
         <TableContainer component={Paper} elevation={4} sx={{ mt: 4, mb: 4 }}>
@@ -25,74 +33,66 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                     <TableHead>
                         <TableRow sx={{ backgroundColor: '#e0e0e0' }}>
                             <TableCell>Продукт</TableCell>
-                            <TableCell align="center">Sting продукт</TableCell>
-                            <TableCell align="center">Sting цена</TableCell>
-                            <TableCell align="center">Phoenix продукт</TableCell>
-                            <TableCell align="center">Phoenix цена</TableCell>
+                            {distributors.map((distributor) => (
+                                <React.Fragment key={distributor}>
+                                    <TableCell align="center">{distributor} продукт</TableCell>
+                                    <TableCell align="center">{distributor} цена</TableCell>
+                                </React.Fragment>
+                            ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {boughtProductsTableProps.products.map((product) => {
-                            const sting_info = product.all_pharmacy_product_infos.filter(info => info.distributor === "Sting")[0] || {name: "Не е намерен", price: -1};
-                            const phoenix_info = product.all_pharmacy_product_infos.filter(info => info.distributor === "Phoenix")[0] || {name: "Не е намерен", price: -1};
                             return (<TableRow key={product.original_product_name} hover>
                                 <TableCell component="th" scope="row" sx={{ minWidth: 300 }}>
                                     {product.original_product_name}
                                 </TableCell>
-                                <TableCell align="right" sx={{ backgroundColor: product.bought_from_distributor === "Sting" ? '#ccffbc' : 'inherit' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        {sting_info?.name || "N/A"} {sting_info?.name && sting_info.is_on_promotion ? <StarIcon style={{ color: '#ff0000' }}/> : ""}
-                                        {sting_info?.name === "" && sting_info.alternative_names && (
-                                            <>
-                                                <div>
-                                                    <button onClick={() => setOpenProduct(product.original_product_name)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                                        <Typography variant="body2" color="error">
-                                                            <AddShoppingCartIcon />
-                                                        </Typography>
-                                                    </button>
-                                                    {openProduct === product.original_product_name && (
-                                                        <AlternativeNames 
-                                                            open={openProduct === product.original_product_name} 
-                                                            onClose={() => setOpenProduct(null)} 
-                                                            productName={product.original_product_name}
-                                                            alternativeNames={sting_info.alternative_names || []}
-                                                        />
-                                                    )}
+                                {distributors.map((distributor) => {
+                                    const productInfo = getProductInfoByDistributor(
+                                        product,
+                                        distributor
+                                    ) || {
+                                        name: 'Не е намерен',
+                                        price: -1,
+                                        alternative_names: [],
+                                        is_on_promotion: false,
+                                    };
+                                    const isHighlighted = product.bought_from_distributor === distributor;
+                                    const hasAlternativeNames = productInfo.name === '' && productInfo.alternative_names.length > 0;
+                                    const backgroundColor = isHighlighted ? '#ccffbc' : (hasAlternativeNames ? '#00ffff' : 'inherit');
+
+                                    return (
+                                        <React.Fragment key={`${product.original_product_name}-${distributor}`}>
+                                            <TableCell align="right" sx={{ backgroundColor }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    {productInfo?.name || 'N/A'} {productInfo?.name && productInfo.is_on_promotion ? <StarIcon style={{ color: '#ff0000' }}/> : ''}
+                                                    {hasAlternativeNames && (
+                                                        <>
+                                                            <div>
+                                                                <button onClick={() => setOpenProduct(product.original_product_name)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                                                    <Typography variant="body2" color="error">
+                                                                        <AddShoppingCartIcon />
+                                                                    </Typography>
+                                                                </button>
+                                                                {openProduct === product.original_product_name && (
+                                                                    <AlternativeNames 
+                                                                        open={openProduct === product.original_product_name} 
+                                                                        onClose={() => setOpenProduct(null)} 
+                                                                        productName={product.original_product_name}
+                                                                        alternativeNames={productInfo.alternative_names || []}
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                        </>
+                                                    )}                                    
                                                 </div>
-                                            </>
-                                        )}                                    
-                                    </div>
-                                </TableCell>
-                                <TableCell align="right" sx={{ minWidth: 50, backgroundColor: product.bought_from_distributor === "Sting" ? '#ccffbc' : 'inherit' }}>
-                                    {sting_info.price > 0 ? `${sting_info.price} €` : "N/A"}
-                                </TableCell>
-                                <TableCell align="right" sx={{ backgroundColor: product.bought_from_distributor === "Phoenix" ? '#ccffbc' : (phoenix_info?.name === "" && phoenix_info.alternative_names ? "#00ffff" : 'inherit') }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        {phoenix_info?.name || "Не е намерен"}
-                                        {phoenix_info?.name === "" && phoenix_info.alternative_names && (
-                                            <>
-                                                <div>
-                                                    <button onClick={() => setOpenProduct(product.original_product_name)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                                        <Typography variant="body2" color="error">
-                                                            <AddShoppingCartIcon />
-                                                        </Typography>
-                                                    </button>
-                                                    {openProduct === product.original_product_name && (
-                                                        <AlternativeNames 
-                                                            open={openProduct === product.original_product_name} 
-                                                            onClose={() => setOpenProduct(null)} 
-                                                            productName={product.original_product_name}
-                                                            alternativeNames={phoenix_info.alternative_names || []}
-                                                        />
-                                                    )}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                </TableCell>
-                                <TableCell align="right" sx={{ minWidth: 50, backgroundColor: product.bought_from_distributor === "Phoenix" ? '#ccffbc' : (phoenix_info?.name === "" && phoenix_info.alternative_names ? "#00ffff" : 'inherit') }}>
-                                    {phoenix_info.price > 0 ? `${phoenix_info.price} €` : "N/A"}
-                                </TableCell>
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ minWidth: 50, backgroundColor }}>
+                                                {productInfo.price > 0 ? `${productInfo.price} €` : 'N/A'}
+                                            </TableCell>
+                                        </React.Fragment>
+                                    );
+                                })}
                             </TableRow>)
                         })}
                     </TableBody>
