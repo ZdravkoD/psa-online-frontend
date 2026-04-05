@@ -35,6 +35,7 @@
     "start": "react-scripts start",
     "build-staging": "dotenv -e .env.staging -- react-scripts build",
     "build": "dotenv -e .env.production -- react-scripts build",
+    "lint": "eslint src --ext .ts,.tsx",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prepare": "husky install"
