@@ -304,7 +304,16 @@ const TaskProgress: React.FC = () => {
                                     />
                                 </Stack>
                                 {group.images.map((image) => (
-                                    <Box key={`${image.sequence}-${image.url}`} mb={3}>
+                                    <Box
+                                        key={`${image.sequence}-${image.url}`}
+                                        mb={3}
+                                        sx={{
+                                            border: '1px solid #cfd8dc',
+                                            borderRadius: 2,
+                                            p: 2,
+                                            backgroundColor: '#fafafa',
+                                        }}
+                                    >
                                         <Stack direction="row" spacing={1} alignItems="center" mb={1} flexWrap="wrap">
                                             <Chip
                                                 size="small"
@@ -318,17 +327,23 @@ const TaskProgress: React.FC = () => {
                                             <Typography variant="body2" color="text.secondary">
                                                 {image.capturedAtLabel}
                                             </Typography>
-                                            {imageSummary.firstImage?.url === image.url && (
-                                                <Chip size="small" color="success" label="Първо" />
+                                            {group.images[0]?.url === image.url && (
+                                                <Chip size="small" color="success" label={`Първо в ${group.provider}`} />
                                             )}
-                                            {imageSummary.lastImage?.url === image.url && (
-                                                <Chip size="small" color="warning" label="Последно" />
+                                            {group.images[group.images.length - 1]?.url === image.url && (
+                                                <Chip size="small" color="warning" label={`Последно в ${group.provider}`} />
                                             )}
                                         </Stack>
                                         <img
                                             src={image.url}
                                             alt={`${group.provider} screenshot ${image.sequence}`}
-                                            style={{ width: '100%', marginBottom: '10px' }}
+                                            style={{
+                                                width: '100%',
+                                                marginBottom: '10px',
+                                                border: '1px solid #b0bec5',
+                                                borderRadius: '6px',
+                                                display: 'block',
+                                            }}
                                         />
                                     </Box>
                                 ))}
