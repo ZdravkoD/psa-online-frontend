@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, LinearProgress, Container, Accordion, AccordionSummary, AccordionDetails, CircularProgress, Button, Tooltip } from '@mui/material';
+import { Box, Typography, LinearProgress, Container, Accordion, AccordionSummary, AccordionDetails, CircularProgress, Button, Tooltip, Alert } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import UnboughtProductsTable from './UnboughtProductsTable';
 import BoughtProductsTable from './BoughtProductsTable';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { useParams } from 'react-router-dom';
-import { apiGet, buildApiUrl } from '../../api/client';
+import { apiGet, apiGetBlob, apiPost, buildApiUrl } from '../../api/client';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import * as XLSX from 'xlsx';
@@ -28,6 +29,8 @@ const TaskProgress: React.FC = () => {
     const [inputFilename, setInputFilename] = useState('');
     const [expanded, setExpanded] = useState(false);
     const [imagesExpanded, setImagesExpanded] = useState(false);
+    const [retryLoading, setRetryLoading] = useState(false);
+    const [retryError, setRetryError] = useState<string | null>(null);
     const [savedAmount, setSavedAmount] = useState(0);
     const taskData: Task | null = useSelector((state: RootState) => taskId ? state.output.data[taskId] : null);
     const reportDistributors = getDistributorNames(
@@ -116,6 +119,41 @@ const TaskProgress: React.FC = () => {
         XLSX.writeFile(workbook, fileName);
     };
 
+    const retryTask = async () => {
+        if (!taskData?.file_name || !taskData.pharmacy_id) {
+            setRetryError('Липсват данни за повторно стартиране на задачата.');
+            return;
+        }
+
+        setRetryLoading(true);
+        setRetryError(null);
+
+        try {
+            const inputFileBlob = await apiGetBlob(
+                `/input-file/${encodeURIComponent(taskData.file_name)}`
+            );
+            const file = new File([inputFileBlob], taskData.file_name, {
+                type: inputFileBlob.type || 'application/octet-stream',
+            });
+            const formData = new FormData();
+
+            formData.append('file', file);
+            formData.append('pharmacy_id', taskData.pharmacy_id);
+            formData.append('distributors', JSON.stringify(taskData.distributors));
+
+            const newTask = await apiPost<{ id: string }>('/task', formData);
+            window.location.href = `/task-progress/${newTask.id}`;
+        } catch (error) {
+            setRetryError(
+                error instanceof Error
+                    ? error.message
+                    : 'Неуспешен опит за повторно стартиране на задачата.'
+            );
+        } finally {
+            setRetryLoading(false);
+        }
+    };
+
     return (
         <Container>
             <Container maxWidth="sm">
@@ -171,6 +209,24 @@ const TaskProgress: React.FC = () => {
                                 </Typography>
                             </AccordionDetails>
                         </Accordion>
+                    )}
+                    {taskData?.status.status === 'error' && (
+                        <Box mt={2}>
+                            <Button
+                                variant="contained"
+                                color="warning"
+                                onClick={retryTask}
+                                startIcon={<RefreshIcon />}
+                                disabled={retryLoading}
+                            >
+                                {retryLoading ? 'Повторно стартиране...' : 'Опитай отново'}
+                            </Button>
+                        </Box>
+                    )}
+                    {retryError && (
+                        <Box mt={2}>
+                            <Alert severity="error">{retryError}</Alert>
+                        </Box>
                     )}
                     {taskData?.status.status !== "success" && !taskData?.status.detailed_error_message && !taskData?.report && (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>

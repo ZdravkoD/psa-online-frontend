@@ -72,6 +72,20 @@ export async function apiGetText(
   return response.text();
 }
 
+export async function apiGetBlob(
+  path: string,
+  params?: Record<string, QueryValue>
+) {
+  const response = await fetch(buildApiUrl(path, params));
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(`${response.status}: ${message || response.statusText}`);
+  }
+
+  return response.blob();
+}
+
 export async function apiPost<T>(path: string, body?: BodyInit | object) {
   return request<T>(path, 'POST', { body });
 }
