@@ -25,9 +25,29 @@ const products = [
       },
     ],
   },
+  {
+    original_product_name: 'бетафузин',
+    bought_from_distributor: 'Sting',
+    all_pharmacy_product_infos: [
+      {
+        distributor: 'Sting',
+        name: 'БЕТАФУЗИН крем',
+        price: 5.94,
+        is_on_promotion: true,
+        alternative_names: [],
+      },
+      {
+        distributor: 'Phoenix',
+        name: 'БЕТАФУЗИН КРЕМ',
+        price: 6.06,
+        is_on_promotion: false,
+        alternative_names: [],
+      },
+    ],
+  },
 ];
 
-test('explains blue cells and the alternative names button with tooltips', async () => {
+test('explains blue cells, the alternative names button, and the promotion star with tooltips', async () => {
   render(<BoughtProductsTable products={products} distributors={['Sting', 'Phoenix']} />);
 
   fireEvent.mouseOver(screen.getAllByText('N/A')[0]);
@@ -44,5 +64,15 @@ test('explains blue cells and the alternative names button with tooltips', async
 
   expect(
     await screen.findByText('Покажи предложените алтернативни имена')
+  ).toBeInTheDocument();
+
+  fireEvent.mouseOver(
+    screen.getByLabelText('Продукт на промоция')
+  );
+
+  expect(
+    await screen.findByText(
+      'Червената звезда означава, че продуктът е на промоция при този дистрибутор.'
+    )
   ).toBeInTheDocument();
 });

@@ -68,6 +68,10 @@ const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, 
     };
 
     const openProductDictionary = () => {
+        if (!product) {
+            return;
+        }
+
         const productDictionaryUrl = new URL(
             `${window.location.origin}/product-names`
         );

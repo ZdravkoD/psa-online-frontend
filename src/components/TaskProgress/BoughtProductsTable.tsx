@@ -17,6 +17,8 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
     const [tableExpanded, setTableExpanded] = useState<boolean>(true);
     const alternativeNamesTooltip =
         'Тази синя клетка означава, че продуктът не е намерен с директно съвпадение, но има предложени алтернативни имена. Натиснете иконата за преглед.';
+    const promotionTooltip =
+        'Червената звезда означава, че продуктът е на промоция при този дистрибутор.';
     const distributors = getDistributorNames(
         boughtProductsTableProps.distributors,
         boughtProductsTableProps.products
@@ -71,7 +73,14 @@ const BoughtProductsTable: React.FC<BoughtProductsTableProps> = (boughtProductsT
                                             >
                                                 <TableCell align="right" sx={{ backgroundColor, cursor: hasAlternativeNames ? 'help' : 'default' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        {productInfo?.name || 'N/A'} {productInfo?.name && productInfo.is_on_promotion ? <StarIcon style={{ color: '#ff0000' }}/> : ''}
+                                                        {productInfo?.name || 'N/A'} {productInfo?.name && productInfo.is_on_promotion ? (
+                                                            <Tooltip title={promotionTooltip} arrow>
+                                                                <StarIcon
+                                                                    aria-label="Продукт на промоция"
+                                                                    style={{ color: '#ff0000' }}
+                                                                />
+                                                            </Tooltip>
+                                                        ) : ''}
                                                         {hasAlternativeNames && (
                                                             <>
                                                                 <div>
