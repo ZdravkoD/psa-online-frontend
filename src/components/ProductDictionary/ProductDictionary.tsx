@@ -17,7 +17,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { apiGet, apiPatch } from "../../api/client";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import ReorderableList from "../ReordableList/ReordableList";
 import { Product } from "../../types/product";
 
@@ -31,15 +31,17 @@ const ProductDictionary: React.FC = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [httpError, setHttpError] = useState<string | null>(null);
   const { searchTermParam } = useParams<{ searchTermParam: string }>();
+  const [searchParams] = useSearchParams();
+  const searchTermFromUrl = searchParams.get("search") || searchTermParam || "";
 
   useEffect(() => {
-    if (searchTermParam) {
-      setPendingSearchTerm(searchTermParam);
+    if (searchTermFromUrl) {
+      setPendingSearchTerm(searchTermFromUrl);
       handleSearch({
-        target: { value: searchTermParam },
+        target: { value: searchTermFromUrl },
       } as React.ChangeEvent<HTMLInputElement>);
     }
-  }, [searchTermParam]);
+  }, [searchTermFromUrl]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps

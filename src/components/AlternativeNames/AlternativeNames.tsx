@@ -67,6 +67,17 @@ const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, 
         }
     };
 
+    const openProductDictionary = () => {
+        const productDictionaryUrl = new URL(
+            `${window.location.origin}/product-names`
+        );
+        productDictionaryUrl.searchParams.set(
+            'search',
+            product.original_product_name
+        );
+        window.open(productDictionaryUrl.toString(), '_blank');
+    };
+
     return (
         <Drawer anchor="right" open={open} onClose={onClose}>
             <div style={{ width: 600, padding: 20 }}>
@@ -82,7 +93,10 @@ const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, 
                         <Typography variant="h4">{product.original_product_name}</Typography>
                         <p></p>
                         <Typography variant="h6"><strong>Текущи имена за търсене: 
-                             <IconButton onClick={() => window.open(`${window.location.origin}/product-names/${encodeURIComponent(product.original_product_name)}`, '_blank')}>
+                             <IconButton
+                                aria-label="Отвори продуктовия речник"
+                                onClick={openProductDictionary}
+                             >
                                 <OpenInNewIcon />
                              </IconButton></strong>
                         </Typography>
