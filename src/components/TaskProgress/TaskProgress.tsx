@@ -83,13 +83,6 @@ const TaskProgress: React.FC = () => {
         setExpanded(!expanded);
     };
 
-    let descriptionObject: Record<string, unknown> | null = null;
-    try {
-        descriptionObject = JSON.parse(taskData?.status.message ? taskData.status.message : "") as Record<string, unknown>;
-    } catch (error) {
-        console.debug("Error parsing description to JSON: ", error);
-    }
-
     const exportToExcel = () => {
         if (!taskData?.report) return;
 
@@ -185,9 +178,15 @@ const TaskProgress: React.FC = () => {
                     <Typography variant="h6" gutterBottom>
                         {taskData?.status.status === "in progress" ? "Прогрес на задачата" : "Резултат от задачата"}
                     </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        {descriptionObject ? String(descriptionObject["original_product_name"]) : taskData?.status.message}
-                    </Typography>
+                    {taskData?.status.status === 'error' ? (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {taskData.status.message}
+                        </Alert>
+                    ) : (
+                        <Typography variant="body1" gutterBottom>
+                            {taskData?.status.message}
+                        </Typography>
+                    )}
                     <Box display="flex" alignItems="center">
                         <Box sx={{ width: '100%', mr: 1 }}>
                             <LinearProgress variant="determinate" value={taskData?.status.progress ? taskData.status.progress : 0} />

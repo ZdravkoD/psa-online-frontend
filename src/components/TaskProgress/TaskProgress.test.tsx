@@ -117,3 +117,12 @@ test('retries a failed task by recreating it from the original file', async () =
   expect((formData.get('file') as File).name).toBe('failed-task.xlsx');
   expect(window.location.href).toBe('/task-progress/task-2');
 });
+
+test('renders status.message as the main error message', async () => {
+  renderTaskProgress();
+
+  expect(
+    await screen.findByText('Неуспешно завършване на задачата!')
+  ).toBeInTheDocument();
+  expect(screen.getByText('backend failed')).toBeInTheDocument();
+});
