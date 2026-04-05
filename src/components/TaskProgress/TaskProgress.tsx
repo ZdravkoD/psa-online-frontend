@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, LinearProgress, Container, Accordion, AccordionSummary, AccordionDetails, CircularProgress, Button, Tooltip, Alert } from '@mui/material';
+import { Box, Typography, LinearProgress, Container, Accordion, AccordionSummary, AccordionDetails, CircularProgress, Button, Tooltip, Alert, Chip, Paper, Stack } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import UnboughtProductsTable from './UnboughtProductsTable';
 import BoughtProductsTable from './BoughtProductsTable';
@@ -22,6 +22,7 @@ import {
     getBoughtProductsExportHeaders,
     getDistributorNames,
 } from '../../utils/report';
+import { groupTaskImages } from '../../utils/taskImages';
 
 const TaskProgress: React.FC = () => {
     const dispatch = useDispatch();
@@ -37,6 +38,7 @@ const TaskProgress: React.FC = () => {
         taskData?.distributors,
         taskData?.report?.bought_products ?? []
     );
+    const imageSummary = groupTaskImages(taskData?.image_urls ?? []);
 
     // Fetch pharmacy data using the useFetchInitData hook
     const { pharmacies } = useFetchInitData();
@@ -278,13 +280,59 @@ const TaskProgress: React.FC = () => {
                 )}
                 {imagesExpanded && taskData?.image_urls && taskData.image_urls.length > 0 && (
                     <Box mt={2}>
-                        {taskData.image_urls.map((image_url, index) => (
-                            <img
-                                key={index}
-                                src={image_url}
-                                alt=""
-                                style={{ width: '100%', marginBottom: '10px' }}
-                            />
+                        <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
+                            <Typography variant="h6" gutterBottom>
+                                Хронология на изображенията
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Първо изображение: {imageSummary.firstImage?.provider || 'Няма'} {imageSummary.firstImage ? `(${imageSummary.firstImage.capturedAtLabel})` : ''}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Последно изображение: {imageSummary.lastImage?.provider || 'Няма'} {imageSummary.lastImage ? `(${imageSummary.lastImage.capturedAtLabel})` : ''}
+                            </Typography>
+                        </Paper>
+                        {imageSummary.groups.map((group) => (
+                            <Paper key={group.provider} elevation={3} sx={{ p: 2, mb: 3 }}>
+                                <Stack direction="row" spacing={1} alignItems="center" mb={2} flexWrap="wrap">
+                                    <Typography variant="h6">
+                                        {group.provider}
+                                    </Typography>
+                                    <Chip
+                                        size="small"
+                                        color="primary"
+                                        label={`${group.images.length} screenshots`}
+                                    />
+                                </Stack>
+                                {group.images.map((image) => (
+                                    <Box key={`${image.sequence}-${image.url}`} mb={3}>
+                                        <Stack direction="row" spacing={1} alignItems="center" mb={1} flexWrap="wrap">
+                                            <Chip
+                                                size="small"
+                                                label={`#${image.sequence} в общата поредица`}
+                                            />
+                                            <Chip
+                                                size="small"
+                                                variant="outlined"
+                                                label={image.kind}
+                                            />
+                                            <Typography variant="body2" color="text.secondary">
+                                                {image.capturedAtLabel}
+                                            </Typography>
+                                            {imageSummary.firstImage?.url === image.url && (
+                                                <Chip size="small" color="success" label="Първо" />
+                                            )}
+                                            {imageSummary.lastImage?.url === image.url && (
+                                                <Chip size="small" color="warning" label="Последно" />
+                                            )}
+                                        </Stack>
+                                        <img
+                                            src={image.url}
+                                            alt={`${group.provider} screenshot ${image.sequence}`}
+                                            style={{ width: '100%', marginBottom: '10px' }}
+                                        />
+                                    </Box>
+                                ))}
+                            </Paper>
                         ))}
                     </Box>
                 )}
