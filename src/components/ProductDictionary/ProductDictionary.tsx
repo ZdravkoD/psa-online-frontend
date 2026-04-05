@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   TableContainer,
   Table,
@@ -17,12 +16,10 @@ import {
   ListItemText,
   CircularProgress,
 } from "@mui/material";
-import config from "../../config/config";
+import { apiGet, apiPatch } from "../../api/client";
 import { useParams } from "react-router-dom";
 import ReorderableList from "../ReordableList/ReordableList";
 import { Product } from "../../types/product";
-
-const API_BASE_URL = config.apiBaseUrl;
 
 const ProductDictionary: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -49,15 +46,16 @@ const ProductDictionary: React.FC = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${API_BASE_URL}/products`, {
-          params: {
-            filter: JSON.stringify({ original_product_name: searchTerm }),
-            skip: (currentPage - 1) * pageSize,
-            limit: pageSize,
-          },
+        const response = await apiGet<{
+          items: Product[];
+          total_count: number;
+        }>('/products', {
+          filter: JSON.stringify({ original_product_name: searchTerm }),
+          skip: (currentPage - 1) * pageSize,
+          limit: pageSize,
         });
-        setProducts(response.data.items);
-        setTotalCount(response.data.total_count);
+        setProducts(response.items);
+        setTotalCount(response.total_count);
         setHttpError(null);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -90,15 +88,12 @@ const ProductDictionary: React.FC = () => {
     variations: string[]
   ): Promise<Error | void> => {
     try {
-      const modifiedProduct = await axios.patch(
-        `${API_BASE_URL}/product/${id}`,
-        {
-          custom_product_name_variations: variations,
-        }
-      );
+      const modifiedProduct = await apiPatch<Product>(`/product/${id}`, {
+        custom_product_name_variations: variations,
+      });
       setProducts(
         products.map((product) =>
-          product.id === id ? modifiedProduct.data : product
+          product.id === id ? modifiedProduct : product
         )
       );
       setHttpError(null);

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import config from '../config/config';
+import { apiGet } from '../api/client';
 
 export interface Pharmacy {
   pharmacy_id: string;
@@ -29,27 +29,14 @@ const initialState: InitDataState = {
 export const fetchInitData = createAsyncThunk(
   'initData/fetchInitData',
   async () => {
-    const [pharmacyResponse, distributorResponse] = await Promise.all([
-      fetch(`${config.apiBaseUrl}/pharmacies`),
-      fetch(`${config.apiBaseUrl}/distributors`),
-    ]);
-
-    if (!pharmacyResponse.ok) {
-      throw new Error('Failed to fetch pharmacies');
-    }
-
-    if (!distributorResponse.ok) {
-      throw new Error('Failed to fetch distributors');
-    }
-
     const [pharmacies, distributors] = await Promise.all([
-      pharmacyResponse.json(),
-      distributorResponse.json(),
+      apiGet<Pharmacy[]>('/pharmacies'),
+      apiGet<Distributor[]>('/distributors'),
     ]);
 
     return {
-      pharmacies: pharmacies as Pharmacy[],
-      distributors: distributors as Distributor[],
+      pharmacies,
+      distributors,
     };
   },
   {

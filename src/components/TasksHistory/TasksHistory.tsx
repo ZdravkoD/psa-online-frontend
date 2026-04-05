@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import config from '../../config/config';
+import { apiGet } from '../../api/client';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import useFetchInitData from '../../hooks/useFetchInitData';
 import redXIcon from '../../assets/icons/red-x-icon.png';
 import greenCheckIcon from '../../assets/icons/green-check-icon.png';
 import loadingIconGif from '../../assets/icons/loading-icon.gif';
-
-const API_BASE_URL = config.apiBaseUrl;
 const PAGE_SIZE = 10;
 const INITIAL_PAGE_SIZE = 30;
 
@@ -70,10 +67,15 @@ const TasksHistory: React.FC = () => {
                     reqSkip += INITIAL_PAGE_SIZE - PAGE_SIZE;
                     reqLimit = PAGE_SIZE;
                 }
-                const response = await axios.get(`${API_BASE_URL}/tasks?skip=${reqSkip}&limit=${reqLimit}&sort={"date_created":-1}&projection={"id":1,"file_name":1,"status":1,"pharmacy_id":1,"date_created":1}`);
-                const filteredTasks = response.data.filter((task: Task) => task.status);
+                const response = await apiGet<Task[]>('/tasks', {
+                    skip: reqSkip,
+                    limit: reqLimit,
+                    sort: '{"date_created":-1}',
+                    projection: '{"id":1,"file_name":1,"status":1,"pharmacy_id":1,"date_created":1}',
+                });
+                const filteredTasks = response.filter((task: Task) => task.status);
                 setTasks(prevTasks => [...prevTasks, ...filteredTasks]);
-                setHasMore(response.data.length === reqLimit);
+                setHasMore(response.length === reqLimit);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
             } finally {

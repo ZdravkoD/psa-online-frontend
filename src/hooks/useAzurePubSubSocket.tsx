@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { apiGetText } from '../api/client';
 import config from '../config/config';
 import { Task } from '../types/task';
 
@@ -11,17 +12,13 @@ function useAzurePubSubSocket() {
 
   useEffect(() => {
     async function generateAccessToken(hubName: string, userId: string) {
-      const url = `${config.apiBaseUrl}/pubsub-token?hub_name=${encodeURIComponent(hubName)}&user_id=${encodeURIComponent(userId)}`;
       try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          const errorMessage = `Failed to fetch access token: (${response.status}) - ${response.statusText}`
-          setWsError(errorMessage);
-          throw new Error(errorMessage);
-        }
-
+        const accessToken = await apiGetText('/pubsub-token', {
+          hub_name: hubName,
+          user_id: userId,
+        });
         setWsError(null);
-        return await response.text();
+        return accessToken;
       } catch(error) {
         const errorMessage = 'Failed to fetch access token: ' + (error instanceof Error ? error.message : String(error))
         setWsError(errorMessage);

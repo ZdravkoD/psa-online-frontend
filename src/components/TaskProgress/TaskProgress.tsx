@@ -4,7 +4,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import UnboughtProductsTable from './UnboughtProductsTable';
 import BoughtProductsTable from './BoughtProductsTable';
 import { useParams } from 'react-router-dom';
-import config from '../../config/config';
+import { apiGet, buildApiUrl } from '../../api/client';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import * as XLSX from 'xlsx';
@@ -21,9 +21,6 @@ import {
     getBoughtProductsExportHeaders,
     getDistributorNames,
 } from '../../utils/report';
-
-
-const API_BASE_URL = config.apiBaseUrl;
 
 const TaskProgress: React.FC = () => {
     const dispatch = useDispatch();
@@ -44,8 +41,7 @@ const TaskProgress: React.FC = () => {
     useEffect(() => {
         const fetchTaskDetails = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/task/${taskId}`);
-                const data = await response.json();
+                const data = await apiGet<Task>(`/task/${taskId}`);
                 setInputFilename(data.file_name);
                 dispatch(setTaskData(data));
             } catch (error) {
@@ -133,7 +129,7 @@ const TaskProgress: React.FC = () => {
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    onClick={() => window.location.href = `${API_BASE_URL}/input-file/${inputFilename}`}
+                                    onClick={() => window.location.href = buildApiUrl(`/input-file/${encodeURIComponent(inputFilename)}`)}
                                     startIcon={<img src={downloadIcon} alt="Download file" style={{ width: 24, height: 'auto' }} />}
                                 >
                                     Свали

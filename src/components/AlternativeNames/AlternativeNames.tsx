@@ -13,8 +13,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import axios from 'axios';
-import config from '../../config/config';
+import { apiGet, apiPatch } from '../../api/client';
 import { Product } from '../../types/product';
 
 interface AlternativeNamesProps {
@@ -23,9 +22,6 @@ interface AlternativeNamesProps {
     alternativeNames: string[];
     onClose: () => void;
 }
-
-const API_BASE_URL = config.apiBaseUrl;
-
 const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, alternativeNames, onClose }) => {
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -34,15 +30,13 @@ const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, 
     useEffect(() => {
         const fetchProductInfo = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/products`, {
-                    params: {
-                        filter: JSON.stringify({ original_product_name: productName }),
-                    },
+                const response = await apiGet<{ items: Product[] }>('/products', {
+                    filter: JSON.stringify({ original_product_name: productName }),
                 });
-                if (response.data.items.length === 0) {
+                if (response.items.length === 0) {
                     throw new Error('Product not found');
                 }
-                setProduct(response.data.items[0]);
+                setProduct(response.items[0]);
             } catch (error) {
                 console.error('Error fetching product info:', error);
             } finally {
@@ -63,11 +57,11 @@ const AlternativeNames: React.FC<AlternativeNamesProps> = ({ open, productName, 
 
     const handleCheckboxChange = async (name: string) => {
         try {
-            const updatedProduct = await axios.patch(`${API_BASE_URL}/product/${product?.id}`, {
+            const updatedProduct = await apiPatch<Product>(`/product/${product?.id}`, {
                 custom_product_name_variations: [...(product?.custom_product_name_variations || []), name],
             });
             setAltNames((prev) => prev.filter((n) => n !== name));
-            setProduct(updatedProduct.data);
+            setProduct(updatedProduct);
         } catch (error) {
             console.error('Error updating product names:', error);
         }

@@ -3,11 +3,8 @@ import { Container, Grid, Typography, RadioGroup, Checkbox, FormControl, FormLab
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiPost } from '../../api/client';
 import useFetchInitData from '../../hooks/useFetchInitData';
-import config from '../../config/config';
-
-
-const API_BASE_URL = config.apiBaseUrl;
 
 
 export default function PsaForm() {
@@ -110,22 +107,10 @@ export default function PsaForm() {
       formData.append('distributors', JSON.stringify(selectedDistributors));
 
       try {
-        const response = await fetch(`${API_BASE_URL}/task`, {
-          method: 'POST',
-          body: formData,
-        });  
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Task created:', data);
-          setHttpError(null);
-          // Navigate to the task progress page
-          navigate(`/task-progress/${data.id}`);
-        } else {
-          const responseText = await response.text();
-          console.error('Failed to create task:', response.statusText, responseText);
-          setHttpError(`${response.status}: ${responseText}`);
-        }  
+        const data = await apiPost<{ id: string }>('/task', formData);
+        console.log('Task created:', data);
+        setHttpError(null);
+        navigate(`/task-progress/${data.id}`);
       }
       catch (error) {
         console.error('Failed to create task:', error);

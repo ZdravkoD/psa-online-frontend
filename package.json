@@ -15,7 +15,6 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.7.7",
     "dnd-kit": "^0.0.2",
     "dotenv": "^16.4.5",
     "react": "^17.0.0 || ^18.0.0",
@@ -59,6 +58,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "dotenv-cli": "^7.4.2",
     "eslint-plugin-unused-imports": "^4.1.4",
     "husky": "^8.0.0",
