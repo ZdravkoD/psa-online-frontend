@@ -16,7 +16,6 @@ import ProductDictionary from './components/ProductDictionary/ProductDictionary'
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
-  const [wsError, setWsError] = React.useState<string>("");
 
   useEffect(() => {
     console.debug("Initiating app...")
@@ -25,15 +24,14 @@ const App: React.FC = () => {
   const outputs = useAzurePubSubSocket();
 
   useEffect(() => {
-    console.debug("Azure Pub/Sub socket connected...");
-    if (outputs.task) {
+    if (outputs.task?.id) {
+      console.debug("Azure Pub/Sub socket connected...");
       dispatch(setTaskData(outputs.task)); // Dispatch to Redux
-    }    
-    setWsError(outputs.wsError as string);
+    }
     return () => {
       console.debug("Azure Pub/Sub socket disconnected...");
     };
-  }, [outputs, dispatch]);
+  }, [outputs.task, dispatch]);
 
   return (
       <Router>
@@ -47,8 +45,8 @@ const App: React.FC = () => {
           <Route path="/product-names/:searchTermParam?" element={<ProductDictionary />} />
         </Routes>
         <Grid item sx={{ width: '100%', mb: 2 }} style={{ padding: 14 }}>
-          {wsError && (
-          <Alert severity="error">{wsError}</Alert>
+          {outputs.wsError && (
+          <Alert severity="error">{outputs.wsError}</Alert>
           )}
         </Grid>
         </Container>

@@ -6,19 +6,7 @@ import { Task } from '../types/task';
 
 // The hook
 function useAzurePubSubSocket() {
-  const [task, setTask] = useState<Task>({
-    id: '',
-    account_id: '',
-    file_name: '',
-    pharmacy_id: '',
-    distributors: [],
-    task_type: '',
-    date_created: '',
-    date_updated: '',
-    status: { status: '', message: '', progress: 0, detailed_error_message: null },
-    report: { bought_products: [], unbought_products: [] },
-    image_urls: null,
-  });
+  const [task, setTask] = useState<Task | null>(null);
   const [wsError, setWsError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -57,10 +45,17 @@ function useAzurePubSubSocket() {
     const ws = new ReconnectingWebSocket(urlProvider);
     
     ws.onmessage = (event) => {
-      setWsError(null);
-      const data = JSON.parse(event.data);
-      console.debug("Received data: ", data);
-      setTask(data);
+      try {
+        setWsError(null);
+        const data = JSON.parse(event.data) as Task;
+        console.debug("Received data: ", data);
+        setTask(data);
+      } catch (error) {
+        setWsError(
+          'Failed to parse websocket message: ' +
+            (error instanceof Error ? error.message : String(error))
+        );
+      }
     };
 
     ws.onerror = (event) => {
