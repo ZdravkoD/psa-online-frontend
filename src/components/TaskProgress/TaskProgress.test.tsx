@@ -5,7 +5,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import TaskProgress from './TaskProgress';
 import outputReducer from '../../store/tasks';
-import initDataReducer from '../../store/initData';
+import initDataReducer, { InitDataState } from '../../store/initData';
 import { Task } from '../../types/task';
 import * as apiClient from '../../api/client';
 
@@ -59,6 +59,13 @@ const failedTask: Task = {
   image_urls: null,
 };
 
+const preloadedInitDataState: InitDataState = {
+  pharmacies: [{ pharmacy_id: 'pharmacy-1', display_name: 'Central' }],
+  distributors: [{ name: 'sting', display_name: 'Sting' }],
+  status: 'succeeded',
+  error: null,
+};
+
 function renderTaskProgress() {
   const store = configureStore({
     reducer: {
@@ -71,12 +78,7 @@ function renderTaskProgress() {
           [failedTask.id]: failedTask,
         },
       },
-      initData: {
-        pharmacies: [{ pharmacy_id: 'pharmacy-1', display_name: 'Central' }],
-        distributors: [{ name: 'sting', display_name: 'Sting' }],
-        status: 'succeeded',
-        error: null,
-      },
+      initData: preloadedInitDataState,
     },
   });
 

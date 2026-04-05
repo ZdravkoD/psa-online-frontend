@@ -12,7 +12,7 @@ export interface Distributor {
   display_name: string;
 }
 
-interface InitDataState {
+export interface InitDataState {
   pharmacies: Pharmacy[];
   distributors: Distributor[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
