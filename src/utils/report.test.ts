@@ -2,6 +2,7 @@ import {
   buildBoughtProductsExportRows,
   getBoughtProductsExportHeaders,
   getDistributorNames,
+  getProductInfoByDistributor,
 } from './report';
 import { BoughtProduct } from '../types/product';
 
@@ -61,4 +62,40 @@ test('builds export headers and rows for every distributor', () => {
     'Medex - цена на продукт': 3.9,
     'Добавен в количката на': 'Medex',
   });
+});
+
+test('deduplicates distributors when task data uses slugs and report data uses display names', () => {
+  expect(
+    getDistributorNames(['sting', 'phoenix'], [
+      {
+        original_product_name: 'Vitamin C',
+        bought_from_distributor: 'Phoenix',
+        all_pharmacy_product_infos: [
+          {
+            distributor: 'Phoenix',
+            name: 'Vitamin C Phoenix',
+            price: 4.1,
+            is_on_promotion: false,
+            alternative_names: [],
+          },
+          {
+            distributor: 'Sting',
+            name: 'Vitamin C Sting',
+            price: 4.3,
+            is_on_promotion: false,
+            alternative_names: [],
+          },
+        ],
+      },
+    ])
+  ).toEqual(['Sting', 'Phoenix']);
+});
+
+test('matches product info by distributor case-insensitively', () => {
+  expect(getProductInfoByDistributor(boughtProducts[0], 'sting')).toEqual(
+    boughtProducts[0].all_pharmacy_product_infos[0]
+  );
+  expect(getProductInfoByDistributor(boughtProducts[0], 'medex')).toEqual(
+    boughtProducts[0].all_pharmacy_product_infos[1]
+  );
 });

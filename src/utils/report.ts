@@ -4,17 +4,44 @@ import {
   UnboughtProduct,
 } from '../types/product';
 
+function normalizeDistributorKey(distributor: string) {
+  return distributor.trim().toLowerCase();
+}
+
+function hasDisplayCasing(distributor: string) {
+  return /[A-Z]/.test(distributor);
+}
+
 export function getDistributorNames(
   distributors: string[] | undefined,
   boughtProducts: BoughtProduct[]
 ) {
-  const orderedDistributors = [...(distributors ?? [])];
+  const orderedDistributors: string[] = [];
+  const distributorIndexes = new Map<string, number>();
+
+  const addDistributor = (distributor: string) => {
+    const normalizedDistributor = normalizeDistributorKey(distributor);
+    const existingIndex = distributorIndexes.get(normalizedDistributor);
+
+    if (existingIndex === undefined) {
+      distributorIndexes.set(normalizedDistributor, orderedDistributors.length);
+      orderedDistributors.push(distributor);
+      return;
+    }
+
+    if (
+      !hasDisplayCasing(orderedDistributors[existingIndex]) &&
+      hasDisplayCasing(distributor)
+    ) {
+      orderedDistributors[existingIndex] = distributor;
+    }
+  };
+
+  (distributors ?? []).forEach(addDistributor);
 
   boughtProducts.forEach((product) => {
     product.all_pharmacy_product_infos.forEach((info) => {
-      if (!orderedDistributors.includes(info.distributor)) {
-        orderedDistributors.push(info.distributor);
-      }
+      addDistributor(info.distributor);
     });
   });
 
@@ -26,7 +53,9 @@ export function getProductInfoByDistributor(
   distributor: string
 ): AllPharmacyProductInfos | undefined {
   return product.all_pharmacy_product_infos.find(
-    (info) => info.distributor === distributor
+    (info) =>
+      normalizeDistributorKey(info.distributor) ===
+      normalizeDistributorKey(distributor)
   );
 }
 
