@@ -23,6 +23,7 @@ import {
     getDistributorNames,
 } from '../../utils/report';
 import { groupTaskImages } from '../../utils/taskImages';
+import { formatTaskDuration } from '../../utils/taskDuration';
 
 const TaskProgress: React.FC = () => {
     const dispatch = useDispatch();
@@ -39,6 +40,10 @@ const TaskProgress: React.FC = () => {
         taskData?.report?.bought_products ?? []
     );
     const imageSummary = groupTaskImages(taskData?.image_urls ?? []);
+    const taskDuration = formatTaskDuration(taskData?.date_created, taskData?.date_updated);
+    const taskDurationLabel = taskData?.status.status === 'in progress'
+        ? 'Изминало време'
+        : 'Време за изпълнение';
 
     // Fetch pharmacy data using the useFetchInitData hook
     const { pharmacies } = useFetchInitData();
@@ -173,6 +178,11 @@ const TaskProgress: React.FC = () => {
                     {taskData?.pharmacy_id && (
                         <Typography variant="h6" gutterBottom>
                             Аптека: <strong>{pharmacies.find(pharmacy => pharmacy.pharmacy_id === taskData.pharmacy_id)?.display_name || "Неизвестна аптека"}</strong>
+                        </Typography>
+                    )}
+                    {taskDuration && (
+                        <Typography variant="body1" gutterBottom>
+                            {taskDurationLabel}: <strong>{taskDuration}</strong>
                         </Typography>
                     )}
                     <Typography variant="h6" gutterBottom>

@@ -125,4 +125,6 @@ test('renders status.message as the main error message', async () => {
     await screen.findByText('Неуспешно завършване на задачата!')
   ).toBeInTheDocument();
   expect(screen.getByText('backend failed')).toBeInTheDocument();
+  expect(screen.getByText(/Време за изпълнение:/)).toBeInTheDocument();
+  expect(screen.getByText('1 мин')).toBeInTheDocument();
 });

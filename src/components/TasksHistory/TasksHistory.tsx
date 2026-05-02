@@ -6,6 +6,8 @@ import useFetchInitData from '../../hooks/useFetchInitData';
 import redXIcon from '../../assets/icons/red-x-icon.png';
 import greenCheckIcon from '../../assets/icons/green-check-icon.png';
 import loadingIconGif from '../../assets/icons/loading-icon.gif';
+import { formatTaskDuration } from '../../utils/taskDuration';
+
 const PAGE_SIZE = 10;
 const INITIAL_PAGE_SIZE = 30;
 
@@ -22,6 +24,7 @@ interface Task {
     };
     report: Record<string, unknown>;
     date_created: string;
+    date_updated?: string;
 }
 
 const statusTranslations: Record<string, string> = {
@@ -71,7 +74,7 @@ const TasksHistory: React.FC = () => {
                     skip: reqSkip,
                     limit: reqLimit,
                     sort: '{"date_created":-1}',
-                    projection: '{"id":1,"file_name":1,"status":1,"pharmacy_id":1,"date_created":1}',
+                    projection: '{"id":1,"file_name":1,"status":1,"pharmacy_id":1,"date_created":1,"date_updated":1}',
                 });
                 const filteredTasks = response.filter((task: Task) => task.status);
                 setTasks(prevTasks => [...prevTasks, ...filteredTasks]);
@@ -114,11 +117,14 @@ const TasksHistory: React.FC = () => {
                             <TableCell style={{ backgroundColor: 'inherit' }}>Файл</TableCell>
                             <TableCell style={{ backgroundColor: 'inherit' }}>Аптека</TableCell>
                             <TableCell style={{ backgroundColor: 'inherit' }}>Дата</TableCell>
+                            <TableCell style={{ backgroundColor: 'inherit' }}>Продължителност</TableCell>
                             <TableCell style={{ backgroundColor: 'inherit' }}>Статус</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {tasks.map((task, index) => {
+                            const taskDuration = formatTaskDuration(task.date_created, task.date_updated);
+
                             return (
                                 <TableRow 
                                     key={task.id} 
@@ -133,6 +139,7 @@ const TasksHistory: React.FC = () => {
                                         {pharmacies.find(pharmacy => pharmacy.pharmacy_id === task.pharmacy_id)?.display_name || `Unknown Pharmacy - ${task.pharmacy_id}`}
                                     </TableCell>
                                     <TableCell>{new Date(task.date_created).toLocaleString()}</TableCell>
+                                    <TableCell>{taskDuration ?? '-'}</TableCell>
                                     <TableCell style={{ display: 'flex', alignItems: 'center' }}>
                                         <img src={statusIcons[task.status.status]} alt="" style={{ width: '30px', height: 'auto', marginRight: '8px' }} />
                                         {statusTranslations[task.status.status] || task.status.status}
