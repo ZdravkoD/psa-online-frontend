@@ -41,7 +41,7 @@ const failedTask: Task = {
   id: 'task-1',
   account_id: 'account-1',
   file_name: 'failed-task.xlsx',
-  file_data: 'https://storage.example.test/input-files/failed-task.xlsx',
+  file_data: 'https://storage.example.test/input-files/blob-prefix_failed-task.xlsx',
   pharmacy_id: 'pharmacy-1',
   distributors: ['sting', 'phoenix'],
   task_type: 'order',
@@ -107,7 +107,7 @@ test('retries a failed task by recreating it from the original file', async () =
   fireEvent.click(await screen.findByRole('button', { name: 'Опитай отново' }));
 
   await waitFor(() => {
-    expect(mockedApiGetBlob).toHaveBeenCalledWith('/input-file/failed-task.xlsx');
+    expect(mockedApiGetBlob).toHaveBeenCalledWith('/input-file/blob-prefix_failed-task.xlsx');
     expect(mockedApiPost).toHaveBeenCalledWith('/task', expect.any(FormData));
   });
 
@@ -130,11 +130,11 @@ test('renders status.message as the main error message', async () => {
   expect(screen.getByText('1 мин')).toBeInTheDocument();
 });
 
-test('uses file_data as the download URL for the input file', async () => {
+test('uses the API input-file route derived from file_data for downloads', async () => {
   renderTaskProgress();
 
   fireEvent.click(await screen.findByRole('button', { name: /Свали/i }));
 
-  expect(window.location.href).toBe('https://storage.example.test/input-files/failed-task.xlsx');
-  expect(mockedBuildApiUrl).not.toHaveBeenCalled();
+  expect(mockedBuildApiUrl).toHaveBeenCalledWith('/input-file/blob-prefix_failed-task.xlsx');
+  expect(window.location.href).toBe('https://api.example.test/input-file/blob-prefix_failed-task.xlsx');
 });

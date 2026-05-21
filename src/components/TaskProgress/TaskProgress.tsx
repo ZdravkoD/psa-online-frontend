@@ -24,6 +24,7 @@ import {
 } from '../../utils/report';
 import { groupTaskImages } from '../../utils/taskImages';
 import { formatTaskDuration } from '../../utils/taskDuration';
+import { getTaskInputFileApiPath } from '../../utils/taskFile';
 
 const TaskProgress: React.FC = () => {
     const dispatch = useDispatch();
@@ -44,10 +45,10 @@ const TaskProgress: React.FC = () => {
         ? 'Изминало време'
         : 'Време за изпълнение';
     const inputFileName = taskData?.file_name ?? '';
-    const inputFileDownloadUrl = taskData?.file_data
-        || (taskData?.file_name
-            ? buildApiUrl(`/input-file/${encodeURIComponent(taskData.file_name)}`)
-            : null);
+    const inputFileApiPath = getTaskInputFileApiPath(taskData?.file_data, taskData?.file_name);
+    const inputFileDownloadUrl = inputFileApiPath
+        ? buildApiUrl(inputFileApiPath)
+        : null;
 
     // Fetch pharmacy data using the useFetchInitData hook
     const { pharmacies } = useFetchInitData();
@@ -123,7 +124,7 @@ const TaskProgress: React.FC = () => {
     };
 
     const retryTask = async () => {
-        if (!taskData?.file_name || !taskData.pharmacy_id) {
+        if (!taskData?.file_name || !taskData.pharmacy_id || !inputFileApiPath) {
             setRetryError('Липсват данни за повторно стартиране на задачата.');
             return;
         }
@@ -132,9 +133,7 @@ const TaskProgress: React.FC = () => {
         setRetryError(null);
 
         try {
-            const inputFileBlob = await apiGetBlob(
-                `/input-file/${encodeURIComponent(taskData.file_name)}`
-            );
+            const inputFileBlob = await apiGetBlob(inputFileApiPath);
             const file = new File([inputFileBlob], taskData.file_name, {
                 type: inputFileBlob.type || 'application/octet-stream',
             });
