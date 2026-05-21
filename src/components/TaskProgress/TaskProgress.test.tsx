@@ -41,6 +41,7 @@ const failedTask: Task = {
   id: 'task-1',
   account_id: 'account-1',
   file_name: 'failed-task.xlsx',
+  file_data: 'https://storage.example.test/input-files/failed-task.xlsx',
   pharmacy_id: 'pharmacy-1',
   distributors: ['sting', 'phoenix'],
   task_type: 'order',
@@ -127,4 +128,13 @@ test('renders status.message as the main error message', async () => {
   expect(screen.getByText('backend failed')).toBeInTheDocument();
   expect(screen.getByText(/Време за изпълнение:/)).toBeInTheDocument();
   expect(screen.getByText('1 мин')).toBeInTheDocument();
+});
+
+test('uses file_data as the download URL for the input file', async () => {
+  renderTaskProgress();
+
+  fireEvent.click(await screen.findByRole('button', { name: /Свали/i }));
+
+  expect(window.location.href).toBe('https://storage.example.test/input-files/failed-task.xlsx');
+  expect(mockedBuildApiUrl).not.toHaveBeenCalled();
 });

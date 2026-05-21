@@ -28,7 +28,6 @@ import { formatTaskDuration } from '../../utils/taskDuration';
 const TaskProgress: React.FC = () => {
     const dispatch = useDispatch();
     const { taskId } = useParams<{ taskId: string }>();
-    const [inputFilename, setInputFilename] = useState('');
     const [expanded, setExpanded] = useState(false);
     const [imagesExpanded, setImagesExpanded] = useState(false);
     const [retryLoading, setRetryLoading] = useState(false);
@@ -44,6 +43,11 @@ const TaskProgress: React.FC = () => {
     const taskDurationLabel = taskData?.status.status === 'in progress'
         ? 'Изминало време'
         : 'Време за изпълнение';
+    const inputFileName = taskData?.file_name ?? '';
+    const inputFileDownloadUrl = taskData?.file_data
+        || (taskData?.file_name
+            ? buildApiUrl(`/input-file/${encodeURIComponent(taskData.file_name)}`)
+            : null);
 
     // Fetch pharmacy data using the useFetchInitData hook
     const { pharmacies } = useFetchInitData();
@@ -52,7 +56,6 @@ const TaskProgress: React.FC = () => {
         const fetchTaskDetails = async () => {
             try {
                 const data = await apiGet<Task>(`/task/${taskId}`);
-                setInputFilename(data.file_name);
                 dispatch(setTaskData(data));
             } catch (error) {
                 console.error('Error fetching task details:', error);
@@ -158,16 +161,20 @@ const TaskProgress: React.FC = () => {
         <Container>
             <Container maxWidth="sm">
                 <Box sx={{ width: '100%', mb: 2 }}>
-                    {inputFilename && (
+                    {inputFileName && (
                         <Box display="flex" justifyContent="center" mb={2} flexDirection="row" alignItems="center">
                             <Typography variant="h5" gutterBottom>
-                                Начален файл: <strong>{inputFilename}</strong>
+                                Начален файл: <strong>{inputFileName}</strong>
                             </Typography>
                             <Box ml={2}>
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    onClick={() => window.location.href = buildApiUrl(`/input-file/${encodeURIComponent(inputFilename)}`)}
+                                    onClick={() => {
+                                        if (inputFileDownloadUrl) {
+                                            window.location.href = inputFileDownloadUrl;
+                                        }
+                                    }}
                                     startIcon={<img src={downloadIcon} alt="Download file" style={{ width: 24, height: 'auto' }} />}
                                 >
                                     Свали

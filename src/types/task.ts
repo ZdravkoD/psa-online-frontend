@@ -35,6 +35,7 @@ export interface TaskStatus {
     id: string;
     account_id: string;
     file_name: string; // The name of the input file
+    file_data?: string | null;
     pharmacy_id: string;
     distributors: string[];
     task_type: string;
